@@ -1,125 +1,65 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/relative"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="435dp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="227dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/X"
-                android:layout_width="match_parent"
-                android:layout_height="95dp"
-                android:text="Azimuth"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        <TextView
+            android:id="@+id/xVal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/azimuth"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
-            <TextView
-                android:id="@+id/Y"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Pitch"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        <TextView
+            android:id="@+id/yVal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/pitch"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-            <TextView
-                android:id="@+id/Z"
-                android:layout_width="match_parent"
-                android:layout_height="51dp"
-                android:text="Roll"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        <TextView
+            android:id="@+id/zVal"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:text="@string/roll"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-            <TextView
-                android:id="@+id/Lat"
-                android:layout_width="match_parent"
-                android:layout_height="75dp"
-                android:text="Lat"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        <TextView
+            android:id="@+id/latVal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/lat"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-            <TextView
-                android:id="@+id/Long"
-                android:layout_width="match_parent"
-                android:layout_height="75dp"
-                android:text="Long"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        <TextView
+            android:id="@+id/longVal"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:text="@string/longi"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-            <TextView
-                android:id="@+id/Alt"
-                android:layout_width="match_parent"
-                android:layout_height="82dp"
-                android:text="Alt"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        <TextView
+            android:id="@+id/altVal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/alt"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/xVal"
-                android:layout_width="wrap_content"
-                android:layout_height="47dp"
-                android:layout_weight="1"
-                android:ems="10"
-                android:inputType="number"
-                android:text="0"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-            <TextView
-                android:id="@+id/yVal"
-                android:layout_width="wrap_content"
-                android:layout_height="5dp"
-                android:layout_weight="1"
-                android:ems="10"
-                android:inputType="number"
-                android:text="0"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-            <TextView
-                android:id="@+id/zVal"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_weight="1"
-                android:ems="10"
-                android:inputType="number"
-                android:text="0"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-            <TextView
-                android:id="@+id/latVal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="0"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-            <TextView
-                android:id="@+id/longVal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="0"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-            <TextView
-                android:id="@+id/altVal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="0"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/bThread"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/counter"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
     </LinearLayout>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
