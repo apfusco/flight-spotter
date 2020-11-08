@@ -1,6 +1,7 @@
 package com.example.blank;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -17,6 +18,30 @@ public class AircraftDataStructure {
                 this.mAircraftBuckets[i][j] = new ArrayList<>();
             }
         }
+
+        // FIXME: This was added for testing orientation stuff
+        float latitude = (float)43.058370;
+        float longitude = (float)-88.306496;
+        int time = Calendar.getInstance().getTime().getSeconds();
+        Aircraft testAircraft = new Aircraft(
+                time,
+                0x696969, // Nice
+                "XES",
+                "Kazakhstan",
+                time,
+                time,
+                longitude,
+                latitude,
+                3000,
+                false,
+                0,
+                0,
+                0,
+                null,
+                0,
+                "Borat",
+                false,
+                0);
     }
 
     public void addAircraft(Aircraft aircraft) {
