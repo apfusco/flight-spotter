@@ -33,8 +33,10 @@ public class MainActivity extends Activity implements SensorEventListener {
     // UI components
     private View view;
     TextView x, y, z,lat,longi,alt,bThread;
-    private float[] mRotationMatrix;
-    private float[] mOrientation;
+    private float [] mRotationMatrix;
+
+    // Globals
+    public static float[] mOrientation;
 
     /** Called when the activity is first created. */
     @Override
@@ -111,6 +113,8 @@ public class MainActivity extends Activity implements SensorEventListener {
             startListening();
         }
     }
+
+
 
     @Override
     public void onSensorChanged(final SensorEvent event) {
