@@ -119,10 +119,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     public void onSensorChanged(final SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-//            Log.i("AYYYY","ROTATION VECTOR[0]:"+event.values[0]);
-//            Log.i("AYYYY","ROTATION VECTOR[1]:"+event.values[1]);
-//            Log.i("AYYYY","ROTATION VECTOR[2]:"+event.values[2]);
-//            Log.i("AYYYY","ROTATION VECTOR[3]:"+event.values[3]);
             SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
 
             SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_X,
@@ -131,58 +127,12 @@ public class MainActivity extends Activity implements SensorEventListener {
             float azimuth = mOrientation[0];
             float pitch = mOrientation[1];
             float roll = mOrientation[2];
+            roll = (float) ((roll + Math.PI/2) % (Math.PI*2)); // Test roll adjustment
             x.setText("Azimuth: " + Float.toString(azimuth));
             y.setText("Pitch:       " + Float.toString(pitch));
             z.setText("Roll:          " + Float.toString(roll));
         }
     }
-    //    private void displayDirection(SensorEvent event) {
-//        // Displays the rough cardinal direction detected by the magnetometer
-//        float angle = event.values[0];
-//
-//        if ((angle > 337.5 && angle < 360) || (angle > 0 && angle < 22.5)) {
-//            dir = "N";
-//        } else if (angle > 22.5 && angle < 67.5) {
-//            dir = "NE";
-//        } else if (angle > 67.5 && angle < 112.5) {
-//            dir = "E";
-//        } else if (angle > 112.5 && angle < 157.5) {
-//            dir = "SE";
-//        } else if (angle > 157.5 && angle < 202.5) {
-//            dir = "S";
-//        } else if (angle > 202.5 && angle < 247.5) {
-//            dir = "SW";
-//        } else if (angle > 247.5 && angle < 292.5) {
-//            dir = "W";
-//        } else if (angle > 292.5 && angle < 337.5) {
-//            dir = "NW ";
-//        }
-//
-//        textDir.setText(dir);
-//    }
-//
-//    private void checkStep(SensorEvent event) {
-//
-//        // Movement
-//        //float x = event.values[0];
-//        //float y = event.values[1];
-//        float z = event.values[2];
-//        Log.d("Acc-Z", Float.toString(z));
-//        //
-//        if (z >= threshHi)
-//        {
-//            if (triggerHi) {
-//                myStepCount++;
-//                triggerHi = false;
-//                textMy.setText(Integer.toString(myStepCount));
-//                //textMy.post(new Runnable()  { public void run() { textMy.setText(myStepCount);} });
-//            }
-//        }
-//        if (z <= threshLow) {
-//            triggerHi = true;
-//        }
-//    }
-//
 
     public void updateLocationInfo(Location location) {
         lat.setText("lat:        " + location.getLatitude());

@@ -1,6 +1,13 @@
 package com.example.blank;
 
+import android.content.Context;
+import android.graphics.Point;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
+
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -13,5 +20,8 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
+    }
+    public void mapAngleToScreen() {
+       FlightMapper flightMapper = new FlightMapper();
     }
 }
