@@ -29,12 +29,12 @@ public class Aircraft {
     private boolean mSpi;          // Special purpose indicator
     private int mPositionSource;   // {0=ADS-B, 1=ASTERIX, 2=MLAT}
 
-    // For tracking position
+    // Spherical position
     private double mSphereR;
-    private double mPhi;
-    private double mTheta;
-    private int mPhiIndex;
-    private int mThetaIndex;
+    private double mAzimuth;
+    private double mPitch;
+    private int mAzimuthIndex;
+    private int mPitchIndex;
 
     public Aircraft(int timeQuery,
                     int icao24,
@@ -77,17 +77,13 @@ public class Aircraft {
 
     }
 
-    public int getPhiIndex() {
-        return this.mPhiIndex;
-    }
+    public int getAzimuthIndex() { return this.mAzimuthIndex; }
 
-    public int getThetaIndex() {
-        return this.mThetaIndex;
-    }
+    public int getPitchIndex() { return this.mPitchIndex; }
 
-    public double getPhi() { return this.mPhi; };
+    public double getAzimuth() { return this.mAzimuth; };
 
-    public double getTheta() { return this.mTheta; };
+    public double getPitch() { return this.mPitch; };
 
     public String getCallsign() { return this.mCallsign; }
 
@@ -106,6 +102,8 @@ public class Aircraft {
             return null;
         }
         double earthR = AirTracker.getEarthRadius((float)posLat) + altitude;
+        // FIXME: This kinda assumes the Earth is flat
+        // x-axis points East, y-axis points North for cartesian
         cartPosVector[0] = (this.mLongitude - posLon) * 2 * Math.PI / 360 * earthR;
         cartPosVector[1] = (this.mLatitude - posLat) * 2 * Math.PI / 360 * earthR;
         cartPosVector[2] = altitude - posAlt;
@@ -116,22 +114,35 @@ public class Aircraft {
         double sphereR = Math.sqrt(Math.pow(cartPosVector[0], 2)
                 + Math.pow(cartPosVector[1], 2)
                 + Math.pow(cartPosVector[2], 2));
-        double phi = Math.atan(cartPosVector[1] / cartPosVector[0]);
+        double arctan;
+        double azimuth;
+        if (cartPosVector[1] == 0)
+            arctan = Math.PI / 2;
+        else
+            arctan = Math.abs(Math.atan(cartPosVector[0] / cartPosVector[1]));
+        if (cartPosVector[0] > 0)
+            azimuth = arctan;
+        else
+            azimuth = -arctan;
         double theta = Math.atan(cylinderR / cartPosVector[2]);
-        if (phi < 0)
-            phi += 2 * Math.PI;
-        if (theta < 0)
-            theta += 2 * Math.PI;
+        double pitch;
+        if (cylinderR == 0) {
+            if (cartPosVector[2] > 0)
+                pitch = Math.PI / 2;
+            else
+                pitch = -Math.PI / 2;
+        } else
+            pitch = Math.atan(cartPosVector[2] / cylinderR);
 
         this.mSphereR = sphereR;
-        this.mPhi = phi;
-        this.mTheta = theta;
-        this.mThetaIndex = (int)Math.round(Math.floor(theta / 2 / Math.PI
-                * AircraftDataStructure.ARRAY_LENGTH));
-        this.mPhiIndex = (int)Math.round(Math.floor(phi / 2 / Math.PI
-                * AircraftDataStructure.ARRAY_LENGTH));
+        this.mAzimuth = azimuth;
+        this.mPitch = pitch;
+        this.mAzimuthIndex = (int)Math.round(Math.floor(azimuth / 2 / Math.PI
+                * AircraftDataStructure.ARRAY_LENGTH)) % AircraftDataStructure.ARRAY_LENGTH;
+        this.mPitchIndex = (int)Math.round(Math.floor(pitch / Math.PI
+                * AircraftDataStructure.ARRAY_LENGTH)) % AircraftDataStructure.ARRAY_LENGTH;
 
-        return new double[] {sphereR, phi, theta};
+        return new double[] {sphereR, azimuth, pitch};
 
     }
 

@@ -107,11 +107,11 @@ public class AirTracker {
         }
     }
 
-    public ArrayList<Aircraft> getAircraftInWindow(double minPhi,
-                                                   double minTheta,
-                                                   double maxPhi,
-                                                   double maxTheta) {
-        return this.mAircraft.getAircraftInWindow(minPhi, minTheta, maxPhi, maxTheta);
+    public ArrayList<Aircraft> getAircraftInWindow(double minAzimuth,
+                                                   double minPitch,
+                                                   double maxAzimuth,
+                                                   double maxPitch) {
+        return this.mAircraft.getAircraftInWindow(minAzimuth, minPitch, maxAzimuth, maxPitch);
     }
 
     private JSONObject getAPILocations(double posLon, double posLat) {
