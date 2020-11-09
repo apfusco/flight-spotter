@@ -1,6 +1,7 @@
 package com.example.blank;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -8,24 +9,74 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Matrix;
+import android.graphics.SurfaceTexture;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.util.Size;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Arrays;
+
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends Activity implements SensorEventListener {
     // sensors
     private LocationManager locationManager;
     private LocationListener locationListener;
     private SensorManager sensorManager;
+    private CameraManager cameraManager;
+    private TextureView textureView;
+
+    // camera components
+    private String cameraId;
+    private CameraDevice cameraDevice;
+    private ImageReader imageReader;
+    private Size imageDimension;
+    private CameraCaptureSession cameraCaptureSessions;
+    private CaptureRequest.Builder captureRequestBuilder;
+    private static final int REQUEST_CAMERA_PERMISSION = 200;
+    CameraDevice.StateCallback stateCallBack = new CameraDevice.StateCallback() {
+        @Override
+        public void onOpened(@NonNull CameraDevice camera) {
+            cameraDevice = camera;
+            createCameraPreview();
+        }
+
+        @Override
+        public void onDisconnected(@NonNull CameraDevice cameraDevice) {
+            cameraDevice.close();
+        }
+
+        @Override
+        public void onError(@NonNull CameraDevice cameraDevice, int i) {
+            cameraDevice.close();
+            cameraDevice = null;
+        }
+    };
+    private Handler mBackgroundHandler;
+    private HandlerThread mBackgroundThread;
+
 
     // handler for thread communication
     private Handler mainHandler = new Handler();
@@ -33,6 +84,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     // UI components
     private View view;
     TextView x, y, z,lat,longi,alt,bThread;
+    ImageView planeThing;
     private float [] mRotationMatrix;
 
     // Globals
@@ -47,6 +99,13 @@ public class MainActivity extends Activity implements SensorEventListener {
         // system services
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         sensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cameraManager = (CameraManager) this.getSystemService(Context.CAMERA_SERVICE);
+        }
+        textureView = (TextureView) findViewById(R.id.textureView);
+        assert textureView != null;
+        textureView.setSurfaceTextureListener(textureListener);
+
 
         // orientations values
         mRotationMatrix =  new float[16];
@@ -60,6 +119,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         longi = findViewById(R.id.longVal);
         alt = findViewById(R.id.altVal);
         bThread = findViewById(R.id.bThread);
+        planeThing = findViewById(R.id.planeThing);
 
         // register sensor manager
         sensorManager.registerListener(this,
@@ -97,6 +157,76 @@ public class MainActivity extends Activity implements SensorEventListener {
         // start calculation thread in background
         calcThread runner = new calcThread();
         new Thread(runner).start();
+    }
+
+    private void createCameraPreview() {
+        try{
+            SurfaceTexture texture = textureView.getSurfaceTexture();
+            assert texture != null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                texture.setDefaultBufferSize(imageDimension.getWidth(), imageDimension.getHeight());
+            }
+            Surface surface = new Surface(texture);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                captureRequestBuilder.addTarget(surface);
+            }
+            cameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
+                @Override
+                public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
+                    if(cameraDevice == null) {
+                        return;
+                    }
+                    cameraCaptureSessions = cameraCaptureSession;
+                    updatePreview();
+                }
+
+                @Override
+                public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
+
+                }
+            }, null);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void updatePreview() {
+        if(cameraDevice == null) {
+
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
+        }
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                cameraCaptureSessions.setRepeatingRequest(captureRequestBuilder.build(), null, mBackgroundHandler);
+            }
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void openCamera() {
+        try {
+            cameraId = cameraManager.getCameraIdList()[0];
+            CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraId);
+            StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            assert map != null;
+            imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
+
+            if (ActivityCompat.checkSelfPermission(this,Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{
+                        Manifest.permission.CAMERA,
+                }, REQUEST_CAMERA_PERMISSION);
+                return;
+            }
+            cameraManager.openCamera(cameraId, stateCallBack, null);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startListening() {
@@ -193,6 +323,28 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
+    TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
+            openCamera();
+        }
+
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
+
+        }
+
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+            return false;
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+
+        }
+    };
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -201,18 +353,45 @@ public class MainActivity extends Activity implements SensorEventListener {
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
                 SensorManager.SENSOR_DELAY_NORMAL);
+
+        startBackgroundThread();
+        if(textureView.isAvailable()) {
+            openCamera();
+        } else {
+            textureView.setSurfaceTextureListener(textureListener);
+        }
     }
+
+    private void startBackgroundThread() {
+        mBackgroundThread = new HandlerThread("Camera Background");
+        mBackgroundThread.start();
+        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+    }
+
 
     @Override
     protected void onPause() {
         // unregister listener
         super.onPause();
+        stopBackgroundThread();
         sensorManager.unregisterListener(this);
+    }
+
+    private void stopBackgroundThread() {
+        mBackgroundThread.quitSafely();
+        try {
+            mBackgroundThread.join();
+            mBackgroundThread = null;
+            mBackgroundHandler = null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     // background thread that is always running and keeping track of time
     class calcThread implements Runnable {
         private long currentCount;
+        private Matrix myMat = new Matrix();
 
         // constructor method
         public calcThread() {
@@ -231,12 +410,15 @@ public class MainActivity extends Activity implements SensorEventListener {
                     e.printStackTrace();
                 }
                 currentCount += 1;
+                myMat.setTranslate(150, 1000);
+                myMat.postRotate(currentCount*7, 675, 1000);
 
                 // post to the main handler
                 mainHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         bThread.setText("count: " + currentCount);
+                        planeThing.setImageMatrix(myMat);
                     }
                 });
             }
