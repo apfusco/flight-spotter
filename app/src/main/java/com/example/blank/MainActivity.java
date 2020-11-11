@@ -28,8 +28,10 @@ import android.location.LocationManager;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -76,7 +78,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     };
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
-
+    private View decorView;
+    private boolean decorFlag = false;
 
     // handler for thread communication
     private Handler mainHandler = new Handler();
@@ -95,6 +98,32 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // keep 16:9 ratio by removing to bar
+        decorView = getWindow().getDecorView();
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        decorView.setSystemUiVisibility(uiOptions);
+        decorView.setOnSystemUiVisibilityChangeListener
+                (new View.OnSystemUiVisibilityChangeListener() {
+                    @Override
+                    public void onSystemUiVisibilityChange(int visibility) {
+
+                        if (decorFlag == true) {
+                            new CountDownTimer(3000, 1000) {
+                                @Override
+                                public void onTick(long l) {}
+                                public void onFinish() {
+                                    // When timer is finished
+                                    // Execute your code here
+                                    int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+                                    decorView.setSystemUiVisibility(uiOptions);
+                                }
+                            }.start();
+                        }
+                        decorFlag = !decorFlag;
+                    }
+                });
 
         // system services
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -215,7 +244,9 @@ public class MainActivity extends Activity implements SensorEventListener {
             CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             assert map != null;
-            imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
+            imageDimension = map.getOutputSizes(SurfaceTexture.class)[2];
+            Log.i("Height: ", String.valueOf(imageDimension.getHeight()));
+            Log.i("Width: ", String.valueOf(imageDimension.getWidth()));
 
             if (ActivityCompat.checkSelfPermission(this,Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{
@@ -360,6 +391,9 @@ public class MainActivity extends Activity implements SensorEventListener {
         } else {
             textureView.setSurfaceTextureListener(textureListener);
         }
+
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        decorView.setSystemUiVisibility(uiOptions);
     }
 
     private void startBackgroundThread() {
