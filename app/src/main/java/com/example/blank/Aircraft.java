@@ -130,6 +130,7 @@ public class Aircraft {
                 * AircraftDataStructure.ARRAY_LENGTH));
         this.mPhiIndex = (int)Math.round(Math.floor(phi / 2 / Math.PI
                 * AircraftDataStructure.ARRAY_LENGTH));
+        Log.i("UPDATE RELATIVE ANGLE", "From Lon:" + posLon + "Lat:" +posLat + "alt"+ posAlt + "-----> phi:" + phi + "theta:" + theta);
 
         return new double[] {sphereR, phi, theta};
 

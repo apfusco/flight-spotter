@@ -12,11 +12,14 @@ import androidx.core.app.ActivityCompat;
 import java.util.ArrayList;
 
 public class FlightMapper {
-    // Field of view for Pixel XL camera in degrees
+    // Google Pixel XL in 16:9 crop mode
+    private final double VERTICAL_FOV = 66.9;
     private final double DIAGONAL_FOV = 74.32;
     private final double HORIZONTAL_FOV = 40.77;
-    private final double VERTICAL_FOV = 66.9;
-
+    // Full 4:3
+//    WidthDegrees	66.9°
+//    HeightDegrees	51.95°
+//    Diagonal Degrees	78.76°
     // Tells the main UI thread where to display icons for flights.
     public void mapPlanesToScreen (Context context) {
         // Get phone's orientation
@@ -26,13 +29,14 @@ public class FlightMapper {
 
         // Determine the center of the phone's fov in our spherical coordinate system and the bounds
         // of a square around it the size of the diagonal fov of the phone. This gives us all the
-        // angles we might be able to see for a specific heading and polar angle of the phone.
+        // angles we might be able to see for a specific heading and polar angle of the phone before
+        // we actually account for the roll of the phone.
         // TODO change back to android coordinate system
         float myPhi = azimuthToPhi(myAzimuth);
         float myTheta = pitchToTheta(myPitch);
         float myAdjustRoll = adjustRoll(myRoll);
-        double phiBound1 = (myPhi - Math.toRadians(DIAGONAL_FOV)/2) % Math.PI*2;
-        double phiBound2 = (myPhi + Math.toRadians(DIAGONAL_FOV)/2) % Math.PI*2;
+        double phiBound1 = ((myPhi - Math.toRadians(DIAGONAL_FOV)/2) % (Math.PI*2) + (2*Math.PI)) % (2*Math.PI);
+        double phiBound2 = (myPhi + Math.toRadians(DIAGONAL_FOV)/2) % (Math.PI*2);
         double thetaBound1 = myTheta - Math.toRadians(DIAGONAL_FOV)/2;
         double thetaBound2 = myTheta + Math.toRadians(DIAGONAL_FOV)/2;
         if ((thetaBound1 < 0 && thetaBound2 > 0) || 
@@ -41,6 +45,7 @@ public class FlightMapper {
             //  that case.
             return;
         }
+
         AirTracker airTracker = new AirTracker();
 
         // Query all flights in a square the size of the diagonal fov.
@@ -71,9 +76,9 @@ public class FlightMapper {
             int rotY = (int) Math.round(x*Math.sin(myAdjustRoll) + y*Math.cos(myAdjustRoll));
             newPoint.x = rotX;
             newPoint.y = rotY;
+            // Shift origin back to top left of screen
             points.add(newPoint);
         }
-
 
         // Tell UI thread to draw planes to the screen and attach a key to each for flight data
         // retrieval
@@ -81,7 +86,7 @@ public class FlightMapper {
     }
 
     private float azimuthToPhi(float az) {
-        return (float) ((Math.PI/2 - az) % (2*Math.PI));
+        return (float) ( ((Math.PI/2 - az) % (2*Math.PI) + (2*Math.PI)) % (2*Math.PI) );
     }
 
     private float pitchToTheta(float pitch) {
@@ -89,6 +94,6 @@ public class FlightMapper {
     }
 
     private float adjustRoll(float roll) {
-        return (float) ((roll + Math.PI/2) % (Math.PI*2));
+        return (float) ( ((roll + Math.PI/2) % (Math.PI*2) + (2*Math.PI)) % (2*Math.PI));
     }
 }
