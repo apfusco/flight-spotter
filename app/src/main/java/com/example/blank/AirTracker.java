@@ -168,11 +168,12 @@ public class AirTracker {
     }
 
     public static int getEarthRadius(float latitude) {
-        return (int)Math.round(
-                (Math.pow((Math.pow(EARTH_RADIUS_EQUATOR, 2) * Math.cos(latitude)), 2)
-                + Math.pow((Math.pow(EARTH_RADIUS_POLES, 2) * Math.sin(latitude)), 2))
-                / (Math.pow((EARTH_RADIUS_EQUATOR * Math.cos(latitude)), 2)
-                + Math.pow((EARTH_RADIUS_POLES * Math.sin(latitude)), 2)));
+        double theta = latitude / 360 * 2 * Math.PI;
+        return (int)Math.round(Math.sqrt(
+                (Math.pow((Math.pow(EARTH_RADIUS_EQUATOR, 2) * Math.cos(theta)), 2)
+                + Math.pow((Math.pow(EARTH_RADIUS_POLES, 2) * Math.sin(theta)), 2))
+                / (Math.pow((EARTH_RADIUS_EQUATOR * Math.cos(theta)), 2)
+                + Math.pow((EARTH_RADIUS_POLES * Math.sin(theta)), 2))));
     }
 
 }
