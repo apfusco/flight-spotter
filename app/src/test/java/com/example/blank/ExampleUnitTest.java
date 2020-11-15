@@ -1,6 +1,13 @@
 package com.example.blank;
 
+import android.content.Context;
+import android.graphics.Point;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
+
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 

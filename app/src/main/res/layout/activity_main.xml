@@ -28,8 +28,29 @@
         <TextView
             android:id="@+id/zVal"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="wrap_content"
             android:text="@string/roll"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+        <TextView
+            android:id="@+id/phiWindow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="phiWindow:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+        <TextView
+            android:id="@+id/thetaWindow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="thetaWindow:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+        <TextView
+            android:id="@+id/testAircraftVisible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="testAircraftVisible: "
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <TextView

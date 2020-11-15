@@ -21,7 +21,14 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class MainActivity extends Activity implements SensorEventListener {
+    // Google Pixel XL in 16:9 crop mode
+    private final double VERTICAL_FOV = 66.9;
+    private final double DIAGONAL_FOV = 74.32;
+    private final double HORIZONTAL_FOV = 40.77;
+
     // sensors
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -32,12 +39,12 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     // UI components
     private View view;
-    TextView x, y, z,lat,longi,alt,bThread;
+    TextView x, y, z,lat,longi,alt,bThread,phiWin,thetaWin,testVisible;
     private float [] mRotationMatrix;
 
     // Globals
     public static float[] mOrientation;
-
+    public static Location mLocation;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,6 +67,9 @@ public class MainActivity extends Activity implements SensorEventListener {
         longi = findViewById(R.id.longVal);
         alt = findViewById(R.id.altVal);
         bThread = findViewById(R.id.bThread);
+        phiWin = findViewById(R.id.phiWindow);
+        thetaWin = findViewById(R.id.thetaWindow);
+        testVisible = findViewById(R.id.testAircraftVisible);
 
         // register sensor manager
         sensorManager.registerListener(this,
@@ -92,6 +102,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if(location!=null) {
             updateLocationInfo(location);
+            mLocation = location;
         }
 
         // start calculation thread in background
@@ -119,10 +130,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     public void onSensorChanged(final SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-//            Log.i("AYYYY","ROTATION VECTOR[0]:"+event.values[0]);
-//            Log.i("AYYYY","ROTATION VECTOR[1]:"+event.values[1]);
-//            Log.i("AYYYY","ROTATION VECTOR[2]:"+event.values[2]);
-//            Log.i("AYYYY","ROTATION VECTOR[3]:"+event.values[3]);
             SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
 
             SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_X,
@@ -131,58 +138,30 @@ public class MainActivity extends Activity implements SensorEventListener {
             float azimuth = mOrientation[0];
             float pitch = mOrientation[1];
             float roll = mOrientation[2];
-            x.setText("Azimuth: " + Float.toString(azimuth));
-            y.setText("Pitch:       " + Float.toString(pitch));
-            z.setText("Roll:          " + Float.toString(roll));
+            float phi = azimuthToPhi(azimuth);
+            float theta = pitchToTheta(pitch);
+            float adjRoll = adjustRoll(roll);
+            double phiBound1 = ((phi - Math.toRadians(DIAGONAL_FOV)/2) % (Math.PI*2) + (2*Math.PI)) % (2*Math.PI);
+            double phiBound2 = (phi + Math.toRadians(DIAGONAL_FOV)/2) % (Math.PI*2);
+            double thetaBound1 = theta - Math.toRadians(DIAGONAL_FOV)/2;
+            double thetaBound2 = theta + Math.toRadians(DIAGONAL_FOV)/2;
+            x.setText("Phi: " + Float.toString(phi));
+            y.setText("Theta:       " + Float.toString(theta));
+            z.setText("Adjusted Roll:          " + Float.toString(adjRoll));
+            phiWin.setText("Phi Window: " + Float.toString((float)phiBound1) + " " + Float.toString((float)phiBound2));
+            thetaWin.setText("Theta Window: " + Float.toString((float)thetaBound1) + " " + Float.toString((float)thetaBound2));
+            AirTracker airTracker = new AirTracker();
+            // Query all flights in a square the size of the diagonal fov.
+            airTracker.
+            ArrayList<Aircraft> visibleAircraft = airTracker
+                    .getAircraftInWindow(0,0,2*Math.PI, Math.PI);
+            if (visibleAircraft.size() > 0) {
+                testVisible.setText("Test Visible: True");
+            } else {
+                testVisible.setText("Test Visible: False");
+            }
         }
     }
-    //    private void displayDirection(SensorEvent event) {
-//        // Displays the rough cardinal direction detected by the magnetometer
-//        float angle = event.values[0];
-//
-//        if ((angle > 337.5 && angle < 360) || (angle > 0 && angle < 22.5)) {
-//            dir = "N";
-//        } else if (angle > 22.5 && angle < 67.5) {
-//            dir = "NE";
-//        } else if (angle > 67.5 && angle < 112.5) {
-//            dir = "E";
-//        } else if (angle > 112.5 && angle < 157.5) {
-//            dir = "SE";
-//        } else if (angle > 157.5 && angle < 202.5) {
-//            dir = "S";
-//        } else if (angle > 202.5 && angle < 247.5) {
-//            dir = "SW";
-//        } else if (angle > 247.5 && angle < 292.5) {
-//            dir = "W";
-//        } else if (angle > 292.5 && angle < 337.5) {
-//            dir = "NW ";
-//        }
-//
-//        textDir.setText(dir);
-//    }
-//
-//    private void checkStep(SensorEvent event) {
-//
-//        // Movement
-//        //float x = event.values[0];
-//        //float y = event.values[1];
-//        float z = event.values[2];
-//        Log.d("Acc-Z", Float.toString(z));
-//        //
-//        if (z >= threshHi)
-//        {
-//            if (triggerHi) {
-//                myStepCount++;
-//                triggerHi = false;
-//                textMy.setText(Integer.toString(myStepCount));
-//                //textMy.post(new Runnable()  { public void run() { textMy.setText(myStepCount);} });
-//            }
-//        }
-//        if (z <= threshLow) {
-//            triggerHi = true;
-//        }
-//    }
-//
 
     public void updateLocationInfo(Location location) {
         lat.setText("lat:        " + location.getLatitude());
@@ -241,5 +220,17 @@ public class MainActivity extends Activity implements SensorEventListener {
                 });
             }
         }
+    }
+
+    private float azimuthToPhi(float az) {
+        return (float) ( ((Math.PI/2 - az) % (2*Math.PI) + (2*Math.PI)) % (2*Math.PI) );
+    }
+
+    private float pitchToTheta(float pitch) {
+        return (float) (pitch + Math.PI/2);
+    }
+
+    private float adjustRoll(float roll) {
+        return (float) ( ((roll + Math.PI/2) % (Math.PI*2) + (2*Math.PI)) % (2*Math.PI));
     }
 }
