@@ -91,7 +91,7 @@ public class Aircraft {
 
         // Get cartesian position vector in meters
         double[] cartPosVector = new double[3];
-        float altitude;
+        double altitude;
         if (this.mGeoAltitude != 0)
             altitude = this.mGeoAltitude;
         else if (this.mBaroAltitude != 0)
@@ -103,9 +103,11 @@ public class Aircraft {
         }
         double earthR = AirTracker.getEarthRadius((float)posLat) + altitude;
         // FIXME: This kinda assumes the Earth is flat
+        // FIXME: Ignores International Dateline edge case
         // x-axis points East, y-axis points North for cartesian
-        cartPosVector[0] = (this.mLongitude - posLon) * 2 * Math.PI / 360 * earthR;
-        cartPosVector[1] = (this.mLatitude - posLat) * 2 * Math.PI / 360 * earthR;
+        cartPosVector[0] = (this.mLongitude - posLon) / 360 * 2 * Math.PI * earthR
+                * Math.cos((this.mLatitude + posLat) / 360 * Math.PI);
+        cartPosVector[1] = (this.mLatitude - posLat) / 360 * 2 * Math.PI * earthR;
         cartPosVector[2] = altitude - posAlt;
 
         // Get spherical coordinates
@@ -114,20 +116,27 @@ public class Aircraft {
         double sphereR = Math.sqrt(Math.pow(cartPosVector[0], 2)
                 + Math.pow(cartPosVector[1], 2)
                 + Math.pow(cartPosVector[2], 2));
+
         double arctan;
         double azimuth;
         if (cartPosVector[1] == 0)
             arctan = Math.PI / 2;
         else
             arctan = Math.abs(Math.atan(cartPosVector[0] / cartPosVector[1]));
-        if (cartPosVector[0] > 0)
-            azimuth = arctan;
+        if (cartPosVector[0] >= 0)
+            if (cartPosVector[1] >= 0)
+                azimuth = arctan;
+            else
+                azimuth = Math.PI - arctan;
         else
-            azimuth = -arctan;
-        double theta = Math.atan(cylinderR / cartPosVector[2]);
+            if (cartPosVector[1] >= 0)
+                azimuth = -arctan;
+            else
+                azimuth = -Math.PI + arctan;
+
         double pitch;
         if (cylinderR == 0) {
-            if (cartPosVector[2] > 0)
+            if (cartPosVector[2] >= 0)
                 pitch = Math.PI / 2;
             else
                 pitch = -Math.PI / 2;
@@ -139,8 +148,12 @@ public class Aircraft {
         this.mPitch = pitch;
         this.mAzimuthIndex = (int)Math.round(Math.floor(azimuth / 2 / Math.PI
                 * AircraftDataStructure.ARRAY_LENGTH)) % AircraftDataStructure.ARRAY_LENGTH;
+        if (this.mAzimuthIndex < 0)
+            this.mAzimuthIndex += AircraftDataStructure.ARRAY_LENGTH;
         this.mPitchIndex = (int)Math.round(Math.floor(pitch / Math.PI
                 * AircraftDataStructure.ARRAY_LENGTH)) % AircraftDataStructure.ARRAY_LENGTH;
+        if (this.mPitchIndex < 0)
+            this.mPitchIndex += AircraftDataStructure.ARRAY_LENGTH;
 
         return new double[] {sphereR, azimuth, pitch};
 
