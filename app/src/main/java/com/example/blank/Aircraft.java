@@ -147,13 +147,15 @@ public class Aircraft {
         this.mAzimuth = azimuth;
         this.mPitch = pitch;
         this.mAzimuthIndex = (int)Math.round(Math.floor(azimuth / 2 / Math.PI
-                * AircraftDataStructure.ARRAY_LENGTH)) % AircraftDataStructure.ARRAY_LENGTH;
-        if (this.mAzimuthIndex < 0)
-            this.mAzimuthIndex += AircraftDataStructure.ARRAY_LENGTH;
+                * AircraftDataStructure.ARRAY_LENGTH)) % AircraftDataStructure.ARRAY_LENGTH
+                + AircraftDataStructure.ARRAY_LENGTH / 2;
+        // if (this.mAzimuthIndex < 0)
+        //     this.mAzimuthIndex += AircraftDataStructure.ARRAY_LENGTH;
         this.mPitchIndex = (int)Math.round(Math.floor(pitch / Math.PI
-                * AircraftDataStructure.ARRAY_LENGTH)) % AircraftDataStructure.ARRAY_LENGTH;
-        if (this.mPitchIndex < 0)
-            this.mPitchIndex += AircraftDataStructure.ARRAY_LENGTH;
+                * AircraftDataStructure.ARRAY_LENGTH)) % AircraftDataStructure.ARRAY_LENGTH
+                + AircraftDataStructure.ARRAY_LENGTH / 2;
+        // if (this.mPitchIndex < 0)
+        //     this.mPitchIndex += AircraftDataStructure.ARRAY_LENGTH;
 
         return new double[] {sphereR, azimuth, pitch};
 
