@@ -91,6 +91,11 @@ public class AirTrackingUnitTests {
         assertEquals(1, aircraftList.size());
         assertEquals(testAircraft, aircraftList.get(0));
 
+        // Test regular window
+        aircraftList = dataStructure.getAircraftInWindow(-3.1, 0.3, -2.8, 0.5);
+        assertEquals(1, aircraftList.size());
+        assertEquals(testAircraft, aircraftList.get(0));
+
         // Test edge case to the South
         aircraftList = dataStructure.getAircraftInWindow(2.8, 0.3, -2.8, 0.5);
         assertEquals(1, aircraftList.size());
