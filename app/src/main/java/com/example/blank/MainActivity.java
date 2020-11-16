@@ -36,8 +36,12 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Arrays;
 
@@ -89,6 +93,9 @@ public class MainActivity extends Activity implements SensorEventListener {
     TextView x, y, z,lat,longi,alt,bThread;
     ImageView planeThing;
     private float [] mRotationMatrix;
+    private FloatingActionButton fab_main, fab1_mail, fab2_share;
+    private Animation fab_open, fab_close, fab_clock, fab_anticlock;
+    Boolean isOpen = false;
 
     // Globals
     public static float[] mOrientation;
@@ -98,6 +105,50 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        fab_main = findViewById(R.id.fab);
+        fab1_mail = findViewById(R.id.fab1);
+        fab2_share = findViewById(R.id.fab2);
+        fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
+        fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        fab_clock = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_rotate_clock);
+        fab_anticlock = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_rotate_anticlock);
+        fab_main.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (isOpen) {
+                    fab2_share.startAnimation(fab_close);
+                    fab1_mail.startAnimation(fab_close);
+                    fab_main.startAnimation(fab_anticlock);
+                    fab2_share.setClickable(false);
+                    fab1_mail.setClickable(false);
+                    isOpen = false;
+                } else {
+                    fab2_share.startAnimation(fab_open);
+                    fab1_mail.startAnimation(fab_open);
+                    fab_main.startAnimation(fab_clock);
+                    fab2_share.setClickable(true);
+                    fab1_mail.setClickable(true);
+                    isOpen = true;
+                }
+
+            }
+        });
+
+        fab2_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // open dialog
+            }
+        });
+
+        fab1_mail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // open map view
+            }
+        });
 
         // keep 16:9 ratio by removing to bar
         decorView = getWindow().getDecorView();
@@ -110,7 +161,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                     public void onSystemUiVisibilityChange(int visibility) {
 
                         if (decorFlag == true) {
-                            new CountDownTimer(3000, 1000) {
+                            new CountDownTimer(5000, 1000) {
                                 @Override
                                 public void onTick(long l) {}
                                 public void onFinish() {

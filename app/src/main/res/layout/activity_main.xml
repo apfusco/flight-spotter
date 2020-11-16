@@ -80,16 +80,18 @@
 
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:clickable="true"
-        android:src="@drawable/ic_baseline_info_24"
-        android:layout_margin="16dp"
-        android:tint="#A6FFFFFF"
-        app:backgroundTint="#F44336" />
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/floatingActionButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentRight="true"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:clickable="true"-->
+<!--        android:src="@drawable/ic_baseline_info_24"-->
+<!--        android:layout_margin="16dp"-->
+<!--        android:tint="#A6FFFFFF"-->
+<!--        app:backgroundTint="#F44336" />-->
+
+    <include layout="@layout/content_main" />
 
 </RelativeLayout>
