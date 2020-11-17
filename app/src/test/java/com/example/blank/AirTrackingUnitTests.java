@@ -91,6 +91,10 @@ public class AirTrackingUnitTests {
         assertEquals(1, aircraftList.size());
         assertEquals(testAircraft, aircraftList.get(0));
 
+        // Incorrect bounds
+        aircraftList = dataStructure.getAircraftInWindow(-2.7, 0.3, 0, 0.5);
+        assertEquals(0, aircraftList.size());
+
         // Test regular window
         aircraftList = dataStructure.getAircraftInWindow(-3.1, 0.3, -2.8, 0.5);
         assertEquals(1, aircraftList.size());
