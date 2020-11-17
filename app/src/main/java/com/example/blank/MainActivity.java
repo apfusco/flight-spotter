@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
@@ -140,13 +141,14 @@ public class MainActivity extends Activity implements SensorEventListener {
             @Override
             public void onClick(View view) {
                 // open dialog
+                startDialog(view);
             }
         });
 
         fab1_mail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // open map view
+                // open map
             }
         });
 
@@ -160,15 +162,20 @@ public class MainActivity extends Activity implements SensorEventListener {
                     @Override
                     public void onSystemUiVisibilityChange(int visibility) {
 
-                        if (decorFlag == true) {
+                        if (decorFlag == true && isOpen == false) {
                             new CountDownTimer(5000, 1000) {
                                 @Override
                                 public void onTick(long l) {}
                                 public void onFinish() {
                                     // When timer is finished
                                     // Execute your code here
-                                    int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-                                    decorView.setSystemUiVisibility(uiOptions);
+                                    if (isOpen == true) {
+                                        // restart timer
+                                        this.start();
+                                    } else {
+                                        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+                                        decorView.setSystemUiVisibility(uiOptions);
+                                    }
                                 }
                             }.start();
                         }
@@ -185,7 +192,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         textureView = (TextureView) findViewById(R.id.textureView);
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
-
 
         // orientations values
         mRotationMatrix =  new float[16];
@@ -348,53 +354,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             z.setText("Roll:          " + Float.toString(roll));
         }
     }
-    //    private void displayDirection(SensorEvent event) {
-//        // Displays the rough cardinal direction detected by the magnetometer
-//        float angle = event.values[0];
-//
-//        if ((angle > 337.5 && angle < 360) || (angle > 0 && angle < 22.5)) {
-//            dir = "N";
-//        } else if (angle > 22.5 && angle < 67.5) {
-//            dir = "NE";
-//        } else if (angle > 67.5 && angle < 112.5) {
-//            dir = "E";
-//        } else if (angle > 112.5 && angle < 157.5) {
-//            dir = "SE";
-//        } else if (angle > 157.5 && angle < 202.5) {
-//            dir = "S";
-//        } else if (angle > 202.5 && angle < 247.5) {
-//            dir = "SW";
-//        } else if (angle > 247.5 && angle < 292.5) {
-//            dir = "W";
-//        } else if (angle > 292.5 && angle < 337.5) {
-//            dir = "NW ";
-//        }
-//
-//        textDir.setText(dir);
-//    }
-//
-//    private void checkStep(SensorEvent event) {
-//
-//        // Movement
-//        //float x = event.values[0];
-//        //float y = event.values[1];
-//        float z = event.values[2];
-//        Log.d("Acc-Z", Float.toString(z));
-//        //
-//        if (z >= threshHi)
-//        {
-//            if (triggerHi) {
-//                myStepCount++;
-//                triggerHi = false;
-//                textMy.setText(Integer.toString(myStepCount));
-//                //textMy.post(new Runnable()  { public void run() { textMy.setText(myStepCount);} });
-//            }
-//        }
-//        if (z <= threshLow) {
-//            triggerHi = true;
-//        }
-//    }
-//
 
     public void updateLocationInfo(Location location) {
         lat.setText("lat:        " + location.getLatitude());
@@ -447,19 +406,20 @@ public class MainActivity extends Activity implements SensorEventListener {
         decorView.setSystemUiVisibility(uiOptions);
     }
 
+    @Override
+    protected void onPause() {
+        // unregister listeners
+        super.onPause();
+        stopBackgroundThread();
+        sensorManager.unregisterListener(this);
+        
+        // FIXME will need to update the onPause and onResume functions because Opening a new dialog
+    }
+
     private void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("Camera Background");
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
-    }
-
-
-    @Override
-    protected void onPause() {
-        // unregister listener
-        super.onPause();
-        stopBackgroundThread();
-        sensorManager.unregisterListener(this);
     }
 
     private void stopBackgroundThread() {
@@ -471,6 +431,12 @@ public class MainActivity extends Activity implements SensorEventListener {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void startDialog(View v) {
+        // Your code here.
+        Intent intent = new Intent(MainActivity.this, DialogActivity.class);
+        startActivity(intent);
     }
 
     // background thread that is always running and keeping track of time
