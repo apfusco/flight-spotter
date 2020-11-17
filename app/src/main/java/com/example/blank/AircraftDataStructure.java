@@ -63,15 +63,33 @@ public class AircraftDataStructure {
 
         ArrayList<Aircraft> inWindow = new ArrayList<Aircraft>();
 
-        for (int phi = minAzimuthIndex; phi <= maxAzimuthIndex; phi++) {
-            for (int theta = minPitchIndex; theta <= maxPitchIndex; theta++) {
-                for (int i = 0; i < this.mAircraftBuckets[phi][theta].size(); i++) {
-                    Aircraft aircraft = this.mAircraftBuckets[phi][theta].get(i);
-                    if ((aircraft.getAzimuth() >= minAzimuth)
-                            && (aircraft.getAzimuth() <= maxAzimuth)
-                            && (aircraft.getPitch() >= minPitch)
-                            && (aircraft.getPitch() <= maxPitch))
-                        inWindow.add(this.mAircraftBuckets[phi][theta].get(i));
+        System.out.println("maxPitchIndex: " + Integer.toString(maxPitchIndex) + " minPitchIndex: "
+                + Integer.toString(minPitchIndex) + " maxAzimuthIndex: "
+                + Integer.toString(maxAzimuthIndex) + " minAzimuthIndex: "
+                + Integer.toString(minAzimuthIndex));
+
+        for (int azIndex = minAzimuthIndex; (azIndex <= maxAzimuthIndex)
+                || ((maxAzimuthIndex < minAzimuthIndex) && (azIndex >= minAzimuthIndex));
+             azIndex++) {
+            azIndex %= ARRAY_LENGTH;
+            for (int pitIndex = minPitchIndex; pitIndex <= maxPitchIndex; pitIndex++) {
+                for (int i = 0; i < this.mAircraftBuckets[azIndex][pitIndex].size(); i++) {
+                    Aircraft aircraft = this.mAircraftBuckets[azIndex][pitIndex].get(i);
+                    System.out.println("azIndex: " + Integer.toString(azIndex) + " pitIndex: "
+                            + Integer.toString(pitIndex));
+                    if (maxAzimuthIndex < minAzimuthIndex) {
+                        if (((aircraft.getAzimuth() >= minAzimuth)
+                                || (aircraft.getAzimuth() <= maxAzimuth))
+                                && (aircraft.getPitch() >= minPitch)
+                                && (aircraft.getPitch() <= maxPitch)) {
+                            inWindow.add(this.mAircraftBuckets[azIndex][pitIndex].get(i));
+                        }
+                    } else if ((aircraft.getAzimuth() >= minAzimuth)
+                                && (aircraft.getAzimuth() <= maxAzimuth)
+                                && (aircraft.getPitch() >= minPitch)
+                                && (aircraft.getPitch() <= maxPitch)) {
+                        inWindow.add(this.mAircraftBuckets[azIndex][pitIndex].get(i));
+                    }
                 }
             }
         }
