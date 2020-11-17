@@ -41,11 +41,10 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-import java.util.ArrayList;
+import java.util.Arrays;
 
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends Activity implements SensorEventListener {
     // Google Pixel XL in 16:9 crop mode
     private final double VERTICAL_FOV = 66.9;
@@ -68,6 +67,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private CaptureRequest.Builder captureRequestBuilder;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
     CameraDevice.StateCallback stateCallBack = new CameraDevice.StateCallback() {
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
             cameraDevice = camera;
@@ -210,7 +210,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         longi = findViewById(R.id.longVal);
         alt = findViewById(R.id.altVal);
         bThread = findViewById(R.id.bThread);
-        planeThing = findViewById(R.id.planeThing);
         phiWin = findViewById(R.id.phiWindow);
         thetaWin = findViewById(R.id.thetaWindow);
         testVisible = findViewById(R.id.testAircraftVisible);
@@ -254,6 +253,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         new Thread(runner).start();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void createCameraPreview() {
         try{
             SurfaceTexture texture = textureView.getSurfaceTexture();
@@ -493,7 +493,6 @@ public class MainActivity extends Activity implements SensorEventListener {
                     @Override
                     public void run() {
                         bThread.setText("count: " + currentCount);
-                        planeThing.setImageMatrix(myMat);
                     }
                 });
             }
