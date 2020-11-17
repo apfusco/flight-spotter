@@ -1,8 +1,11 @@
 package com.example.blank;
 
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +37,7 @@ public class AirTracker {
     private AircraftDataStructure mAircraft;
     private URL mUrl;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public AirTracker() {
         this.mAircraft = new AircraftDataStructure();
     }
