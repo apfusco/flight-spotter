@@ -8,6 +8,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Matrix;
+import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -18,7 +20,11 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -39,8 +45,9 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     // UI components
     private View view;
-    TextView x, y, z,lat,longi,alt,bThread,phiWin,thetaWin,testVisible;
+    private TextView x, y, z,lat,longi,alt,bThread,phiWin,thetaWin,testVisible;
     private float [] mRotationMatrix;
+    private ImageView planeThing;
 
     // Globals
     public static float[] mOrientation;
@@ -70,6 +77,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         phiWin = findViewById(R.id.phiWindow);
         thetaWin = findViewById(R.id.thetaWindow);
         testVisible = findViewById(R.id.testAircraftVisible);
+        planeThing = findViewById(R.id.planeThing);
 
         // register sensor manager
         sensorManager.registerListener(this,
@@ -129,36 +137,100 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(final SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR && mLocation != null) {
             SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
 
             SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_X,
                     SensorManager.AXIS_Z, mRotationMatrix);
             SensorManager.getOrientation(mRotationMatrix, mOrientation);
             float azimuth = mOrientation[0];
-            float pitch = mOrientation[1];
+            float pitch = mOrientation[1]; // Invert to tell us what the camera angle is not the screen.
             float roll = mOrientation[2];
             float phi = azimuthToPhi(azimuth);
             float theta = pitchToTheta(pitch);
+            float pitchInv = -pitch; // Invert to tell us what the camera angle is not the screen.
             float adjRoll = adjustRoll(roll);
-            double phiBound1 = ((phi - Math.toRadians(DIAGONAL_FOV)/2) % (Math.PI*2) + (2*Math.PI)) % (2*Math.PI);
-            double phiBound2 = (phi + Math.toRadians(DIAGONAL_FOV)/2) % (Math.PI*2);
-            double thetaBound1 = theta - Math.toRadians(DIAGONAL_FOV)/2;
-            double thetaBound2 = theta + Math.toRadians(DIAGONAL_FOV)/2;
-            x.setText("Phi: " + Float.toString(phi));
-            y.setText("Theta:       " + Float.toString(theta));
+            // TODO: fix this so that the window width doesn't decrease when pitch increases etc. How to compensate? Rotate so pitch = 0 straight up?
+            double azBound1 = (((azimuth - Math.toRadians(DIAGONAL_FOV)/2 + Math.PI) % (Math.PI*2) + (2*Math.PI)) % (2*Math.PI)) - Math.PI;
+            double azBound2 = (azimuth + Math.toRadians(DIAGONAL_FOV)/2 + Math.PI) % (Math.PI*2) - Math.PI;
+            double pitchBound1 = (((pitchInv - Math.toRadians(DIAGONAL_FOV)/2 + Math.PI/2) % (Math.PI) + (Math.PI)) % (Math.PI)) - Math.PI/2;;
+            double pitchBound2 = (pitchInv + Math.toRadians(DIAGONAL_FOV)/2 + Math.PI/2) % (Math.PI) - Math.PI/2;
+            if (pitchBound1 > 0 && pitchInv < 0){
+                pitchBound1 = -pitchBound1;
+            }
+            if (pitchBound2 < 0 && pitchInv > 0){
+                pitchBound2 = -pitchBound2;
+            }
+            // Handle north pole case
+            x.setText("Az: " + Float.toString(azimuth));
+            y.setText("Pitch_inv:       " + Float.toString(pitchInv));
             z.setText("Adjusted Roll:          " + Float.toString(adjRoll));
-            phiWin.setText("Phi Window: " + Float.toString((float)phiBound1) + " " + Float.toString((float)phiBound2));
-            thetaWin.setText("Theta Window: " + Float.toString((float)thetaBound1) + " " + Float.toString((float)thetaBound2));
+            phiWin.setText("Az Window: " + Float.toString((float)azBound1) + " " + Float.toString((float)azBound2));
+            thetaWin.setText("Pitch Window: " + Float.toString((float)pitchBound1) + " " + Float.toString((float)pitchBound2));
             AirTracker airTracker = new AirTracker();
             // Query all flights in a square the size of the diagonal fov.
-            airTracker.
+            // airTracker.
             ArrayList<Aircraft> visibleAircraft = airTracker
-                    .getAircraftInWindow(0,0,2*Math.PI, Math.PI);
+                    .getAircraftInWindow(azBound1,pitchBound1,azBound2, pitchBound2);
             if (visibleAircraft.size() > 0) {
                 testVisible.setText("Test Visible: True");
             } else {
                 testVisible.setText("Test Visible: False");
+            }
+
+            // Do a 2-D mapping of angles of flights relative to angle of phone to positions in a 2-D
+            // square of positions on the screen.
+            WindowManager windowManager = (WindowManager) getApplicationContext()
+                    .getSystemService(Context.WINDOW_SERVICE);
+            DisplayMetrics metrics = new DisplayMetrics();
+            windowManager.getDefaultDisplay().getMetrics(metrics);
+            float maxX = metrics.widthPixels;
+            float maxY = metrics.heightPixels;
+
+            float windowWidthPx = Math.round(maxX * (DIAGONAL_FOV/HORIZONTAL_FOV));
+            float windowHeightPx = Math.round(maxY * (DIAGONAL_FOV/VERTICAL_FOV));
+
+            Log.i("Screen Metrics", " maxX:" + maxX+ " maxY:"+ maxY+ " windowWidthPx:"+windowWidthPx+ " windowHeightPx:"+ windowHeightPx);
+
+            // Get relative angles of flights from center of screen and transform from relative angle to
+            // x,y pixel coordinates with the center of the screen being the origin.
+            for (Aircraft aircraft: visibleAircraft) {
+                double aircraftAzimuth = aircraft.getAzimuth();
+                double aircraftPitch = aircraft.getPitch();
+                // Find relative "angular position" and convert from radians to pixels
+                // Handle cases where the azimuths are on opposite sides of the south direction
+                int x = 0;
+                if (aircraft.getAzimuth() - azimuth > Math.toRadians(DIAGONAL_FOV)) {
+                    x = (int) Math.round((2*Math.PI - aircraft.getAzimuth() - azimuth) * (windowHeightPx/Math.toRadians(DIAGONAL_FOV)));
+                }
+                else if (aircraft.getAzimuth() - azimuth < -Math.toRadians(DIAGONAL_FOV)) {
+                    x = (int) Math.round((2*Math.PI + aircraft.getAzimuth() - azimuth) * (windowHeightPx/Math.toRadians(DIAGONAL_FOV)));
+                } else {
+                    x = (int) Math.round((aircraft.getAzimuth() - azimuth) * (windowHeightPx / Math.toRadians(DIAGONAL_FOV)));
+                }
+                // TODO Anything needed for pitch here?
+                int y = (int) Math.round((aircraft.getPitch() - pitchInv) * (windowWidthPx/Math.toRadians(DIAGONAL_FOV)));
+                // Rotate point around origin according to roll
+                int rotX = (int) Math.round(x*Math.cos(adjRoll) - y*Math.sin(adjRoll));
+                int rotY = (int) Math.round(x*Math.sin(adjRoll) + y*Math.cos(adjRoll));
+                // Shift origin back to bottom left of screen (In landscape)
+                float screenX = Math.round(rotX + maxY/2);
+                float screenY = Math.round(rotY + maxX/2);
+
+                // If the plane falls outside of the screen draw on the edge to suggest the direction that it's in.
+                // Map point to screen
+                Log.i("Point mapped", "Rel Az:" + (aircraft.getAzimuth() - azimuth) + " X pos:" + rotX + " Rel Pitch:" + (aircraft.getPitch() - pitchInv) + " Y pos:"+rotY);
+                //Log.i("Point mapped", "Rel Az:" + (aircraft.getAzimuth() - azimuth) + " X pos:" + screenX + " Rel Pitch:" + screenY + "Y pos"+);
+                // post to the main handler
+//                mainHandler.post(new Runnable() {
+////                    @Override
+////                    public void run() {
+////                         ;
+////                    }
+////                });
+              Matrix myMat = new Matrix();
+              myMat.setTranslate(screenY, screenX);
+              planeThing.setImageMatrix(myMat);
             }
         }
     }

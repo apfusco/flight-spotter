@@ -154,9 +154,9 @@ public class Aircraft {
         this.mPitchIndex = (int)Math.round(Math.floor(pitch / Math.PI
                 * AircraftDataStructure.ARRAY_LENGTH)) % AircraftDataStructure.ARRAY_LENGTH
                 + AircraftDataStructure.ARRAY_LENGTH / 2;
+        Log.i("UpdateSphericalPosition","Added Aircraft with Az:" + azimuth +" Pitch:" + pitch);
         // if (this.mPitchIndex < 0)
         //     this.mPitchIndex += AircraftDataStructure.ARRAY_LENGTH;
-
         return new double[] {sphereR, azimuth, pitch};
 
     }

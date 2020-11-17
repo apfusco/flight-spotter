@@ -80,6 +80,13 @@ public class FlightMapper {
 //        // retrieval
 //
 //    }
+    private void clearAllPlanes(){
+
+    }
+
+    private void drawPlaneToScreenLocation(){
+
+    }
 
     private float azimuthToPhi(float az) {
         return (float) ( ((Math.PI/2 - az) % (2*Math.PI) + (2*Math.PI)) % (2*Math.PI) );

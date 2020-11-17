@@ -31,7 +31,7 @@ public class AircraftDataStructure {
                 time,
                 longitude,
                 latitude,
-                AirTracker.getEarthRadius(latitude) + 3000,
+                 3000,
                 false,
                 0,
                 0,
@@ -41,7 +41,8 @@ public class AircraftDataStructure {
                 "Borat",
                 false,
                 0);
-        testAircraft.updateSphericalPosition(MainActivity.mLocation.getLongitude(), MainActivity.mLocation.getLatitude(), AirTracker.getEarthRadius(latitude) + MainActivity.mLocation.getAltitude());
+        testAircraft.updateSphericalPosition(MainActivity.mLocation.getLongitude(), MainActivity.mLocation.getLatitude(),
+                MainActivity.mLocation.getAltitude());
         addAircraft(testAircraft);
     }
 
@@ -106,6 +107,7 @@ public class AircraftDataStructure {
     }
 
     public void updateLocations(float posLon, float posLat, float posAlt) {
+
         for (int azIndex = 0; azIndex < ARRAY_LENGTH; azIndex++) {
             for (int pitIndex = 0; pitIndex < ARRAY_LENGTH; pitIndex++) {
                 for (int i = 0; i < this.mAircraftBuckets[azIndex][pitIndex].size(); i++) {
@@ -117,6 +119,7 @@ public class AircraftDataStructure {
                         this.mAircraftBuckets[aircraft.getAzimuthIndex()][aircraft.getPitchIndex()]
                                 .add(aircraft);
                         this.mAircraftBuckets[azIndex][pitIndex].remove(i--);
+
                     }
                 }
             }
