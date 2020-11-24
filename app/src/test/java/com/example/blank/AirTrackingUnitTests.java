@@ -15,7 +15,7 @@ public class AirTrackingUnitTests {
 
         float planeLatitude = (float)43.058370;
         float planeLongitude = (float)-88.306496;
-        int time = Calendar.getInstance().getTime().getSeconds(); // TODO: Uncertain about format
+        int time = (new Long(Calendar.getInstance().getTime().getTime() / 1000)).intValue();
         Aircraft testAircraft = new Aircraft(
                 time,
                 0x696969, // Nice
@@ -54,7 +54,7 @@ public class AirTrackingUnitTests {
 
         float planeLatitude = (float)43.058370;
         float planeLongitude = (float)-88.306496;
-        int time = Calendar.getInstance().getTime().getSeconds(); // TODO: Uncertain about format
+        int time = (new Long(Calendar.getInstance().getTime().getTime() / 1000)).intValue();
         Aircraft testAircraft = new Aircraft(
                 time,
                 0x696969, // Nice
