@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
+import java.util.Calendar;
+
 public class Aircraft {
 
     // From OpenSky SPI
@@ -89,13 +91,16 @@ public class Aircraft {
 
     public double[] updateSphericalPosition(double posLon, double posLat, double posAlt) {
 
+        // Get current time
+        int curTime = (new Long(Calendar.getInstance().getTime().getTime() / 1000)).intValue();
+
         // Get cartesian position vector in meters
         double[] cartPosVector = new double[3];
         double altitude;
         if (this.mGeoAltitude != 0)
-            altitude = this.mGeoAltitude;
+            altitude = this.mGeoAltitude + this.mVerticalRate * (curTime - this.mTimePosition);
         else if (this.mBaroAltitude != 0)
-            altitude = this.mBaroAltitude;
+            altitude = this.mBaroAltitude + this.mVerticalRate * (curTime - this.mTimePosition);
         else { // TODO: Possibly come up with way to estimate altitude when not given
             Log.w("updateSphericalPosition", "Was not given altitude for "
                     + Integer.toString(this.mIcao24));
@@ -106,8 +111,12 @@ public class Aircraft {
         // FIXME: Ignores International Dateline edge case
         // x-axis points East, y-axis points North for cartesian
         cartPosVector[0] = (this.mLongitude - posLon) / 360 * 2 * Math.PI * earthR
-                * Math.cos((this.mLatitude + posLat) / 360 * Math.PI);
-        cartPosVector[1] = (this.mLatitude - posLat) / 360 * 2 * Math.PI * earthR;
+                * Math.cos((this.mLatitude + posLat) / 360 * Math.PI)
+                + this.mVelocity * (curTime - this.mTimePosition)
+                * Math.sin(this.mTrueTrack / 360 * 2 * Math.PI);
+        cartPosVector[1] = (this.mLatitude - posLat) / 360 * 2 * Math.PI * earthR
+                + this.mVelocity * (curTime - this.mTimePosition)
+                * Math.cos(this.mTrueTrack / 360 * 2 * Math.PI);
         cartPosVector[2] = altitude - posAlt;
 
         // Get spherical coordinates
