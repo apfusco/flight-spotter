@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/relLayout"
     tools:context=".MainActivity">
 
     <TextureView
@@ -12,15 +13,9 @@
         android:layout_height="match_parent" />
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <ImageView
-            android:id="@+id/planeThing"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="matrix"
-            android:src="@drawable/plane" />
     </FrameLayout>
 
     <LinearLayout
