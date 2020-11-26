@@ -162,4 +162,66 @@ public class AirTrackingUnitTests {
         assertTrue(testAircraft.getAzimuth() > -2.9);
         assertEquals(0.3969, testAircraft.getPitch(),0.8);
     }
+
+    @Test
+    public void testUpdateLocations() {
+        final float velocity = 100;
+        final float trueTrack = 270; // South
+        final float verticalRate = 0;
+
+        float viewLatitude = (float)43.117686;
+        float viewLongitude = (float)-88.293514;
+        float viewAltitude = 200;
+
+        float planeLatitude = (float)43.058370;
+        float planeLongitude = (float)-88.306496;
+        int time = (new Long(Calendar.getInstance().getTime().getTime() / 1000)).intValue();
+        Aircraft testAircraft = new Aircraft(
+                time,
+                0x696969, // Nice
+                "XES",
+                "Kazakhstan",
+                time,
+                time,
+                planeLongitude,
+                planeLatitude,
+                3000, // 3000 m altitude
+                false,
+                velocity,
+                trueTrack,
+                verticalRate,
+                null,
+                0,
+                "Borat",
+                false,
+                0);
+        AircraftDataStructure dataStructure = new AircraftDataStructure();
+        dataStructure.addAircraft(testAircraft);
+
+        dataStructure.updateLocations(viewLongitude, viewLatitude, viewAltitude);
+        System.out.println("Azimuth: " + testAircraft.getAzimuth());
+        System.out.println("Azimuth Index: " + testAircraft.getAzimuthIndex());
+        System.out.println("Pitch: " + testAircraft.getPitch());
+        System.out.println("Pitch Index: " + testAircraft.getPitchIndex());
+        assertEquals(-2.9831, testAircraft.getAzimuth(), 0.01);
+        assertEquals(0, testAircraft.getAzimuthIndex());
+        assertEquals(0.3969, testAircraft.getPitch(),0.01);
+        assertEquals(5, testAircraft.getPitchIndex());
+
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        dataStructure.updateLocations(viewLongitude, viewLatitude, viewAltitude);
+        System.out.println("Azimuth: " + testAircraft.getAzimuth());
+        System.out.println("Azimuth Index: " + testAircraft.getAzimuthIndex());
+        System.out.println("Pitch: " + testAircraft.getPitch());
+        System.out.println("Pitch Index: " + testAircraft.getPitchIndex());
+        // assertEquals(-2.9831, testAircraft.getAzimuth(), 0.01);
+        assertTrue(testAircraft.getAzimuth() > -2.9);
+        assertEquals(0.3969, testAircraft.getPitch(),0.8);
+    }
 }
