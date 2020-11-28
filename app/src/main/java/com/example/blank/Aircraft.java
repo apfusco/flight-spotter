@@ -88,6 +88,15 @@ public class Aircraft {
 
     public String getCallsign() { return this.mCallsign; }
 
+    public float getTrueTrack() { return this.mTrueTrack; }
+
+    public float getHeading() {
+        if (this.mTrueTrack > 180)
+            return this.mTrueTrack - 360;
+        else
+            return this.mTrueTrack;
+    }
+
     public float[] getLocation() {
         // Get current time
         int curTime = (new Long(Calendar.getInstance().getTime().getTime() / 1000)).intValue();
