@@ -224,4 +224,57 @@ public class AirTrackingUnitTests {
         assertTrue(testAircraft.getAzimuth() > -2.9);
         assertEquals(0.3969, testAircraft.getPitch(),0.8);
     }
+
+    @Test
+    public void testGetLocation() {
+        final float velocity = 100;
+        final float trueTrack = 270; // South
+        final float verticalRate = 0;
+
+        float viewLatitude = (float)43.117686;
+        float viewLongitude = (float)-88.293514;
+        float viewAltitude = 200;
+
+        float planeLatitude = (float)43.058370;
+        float planeLongitude = (float)-88.306496;
+        int time = (new Long(Calendar.getInstance().getTime().getTime() / 1000)).intValue();
+        Aircraft testAircraft = new Aircraft(
+                time,
+                0x696969, // Nice
+                "XES",
+                "Kazakhstan",
+                time,
+                time,
+                planeLongitude,
+                planeLatitude,
+                3000, // 3000 m altitude
+                false,
+                velocity,
+                trueTrack,
+                verticalRate,
+                null,
+                0,
+                "Borat",
+                false,
+                0);
+        float location[] = testAircraft.getLocation();
+
+        System.out.println("Latitude: " + location[0]);
+        System.out.println("Longitude: " + location[1]);
+        assertEquals(planeLatitude, location[0], 0.001);
+        assertEquals(planeLongitude, location[1], 0.001);
+
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        location = testAircraft.getLocation();
+        System.out.println("Latitude: " + location[0]);
+        System.out.println("Longitude: " + location[1]);
+        assertTrue(planeLatitude > location[0] - 0.001);
+        assertTrue(planeLongitude > location[1] - 0.0001);
+    }
 }

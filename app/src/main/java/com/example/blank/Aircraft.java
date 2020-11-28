@@ -1,11 +1,6 @@
 package com.example.blank;
 
-import android.content.Context;
 import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.loader.content.AsyncTaskLoader;
 
 import java.util.Calendar;
 
@@ -30,6 +25,10 @@ public class Aircraft {
     private String mSquawk;        // Transponder code of the squawk (can be null)
     private boolean mSpi;          // Special purpose indicator
     private int mPositionSource;   // {0=ADS-B, 1=ASTERIX, 2=MLAT}
+
+    // Updated location
+    private float mUpdatedLat;
+    private float mUpdatedLon;
 
     // Spherical position
     private double mSphereR;
@@ -88,6 +87,29 @@ public class Aircraft {
     public double getPitch() { return this.mPitch; };
 
     public String getCallsign() { return this.mCallsign; }
+
+    public float[] getLocation() {
+        // Get current time
+        int curTime = (new Long(Calendar.getInstance().getTime().getTime() / 1000)).intValue();
+
+        double earthR;
+        if (this.mGeoAltitude != 0)
+            earthR = AirTracker.getEarthRadius(this.mLatitude) + this.mGeoAltitude;
+        else
+            earthR = AirTracker.getEarthRadius(this.mLatitude) + this.mBaroAltitude;
+
+        double dX = this.mVelocity * (curTime - this.mTimePosition)
+                * Math.sin(this.mTrueTrack / 360 * 2 * Math.PI);
+        double dY = this.mVelocity * (curTime - this.mTimePosition)
+                * Math.cos(this.mTrueTrack / 360 * 2 * Math.PI);
+        System.out.println("dX: " + Double.toString(dX)); // FIXME
+        System.out.println("dY: " + Double.toString(dY)); // FIXME
+        this.mUpdatedLat = (float) (dY / earthR * 360 / 2 / Math.PI + this.mLatitude);
+        this.mUpdatedLon = (float) (dX / earthR /
+                Math.cos((this.mLatitude + this.mUpdatedLat) / 360 * Math.PI) * 360 / 2 / Math.PI
+                + this.mLongitude);
+        return new float[] {this.mUpdatedLat, this.mUpdatedLon};
+    }
 
     public double[] updateSphericalPosition(double posLon, double posLat, double posAlt) {
 
