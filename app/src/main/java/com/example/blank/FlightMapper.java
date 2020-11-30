@@ -63,12 +63,11 @@ public class FlightMapper implements Runnable{
                 }
                 // TODO Handle north pole case
 
-                Log.i("Az: ", Float.toString(azimuth));
-                Log.i("Pitch_inv: ", Float.toString(pitchInv));
-                Log.i("Adjusted Roll:", Float.toString(adjRoll));
-                Log.i("Az Window: ", Float.toString((float) azBound1) + " " + Float.toString((float) azBound2));
-                Log.i("Pitch Window: ", Float.toString((float) pitchBound1) + " " + Float.toString((float) pitchBound2));
-
+                Log.v("Az: ", Float.toString(azimuth));
+                Log.v("Pitch_inv: ", Float.toString(pitchInv));
+                Log.v("Adjusted Roll:", Float.toString(adjRoll));
+                Log.v("Az Window: ", Float.toString((float) azBound1) + " " + Float.toString((float) azBound2));
+                Log.v("Pitch Window: ", Float.toString((float) pitchBound1) + " " + Float.toString((float) pitchBound2));
 
                 // Query all flights in a square the size of the diagonal fov.
                 // airTracker.
@@ -86,14 +85,21 @@ public class FlightMapper implements Runnable{
                 float windowWidthPx = Math.round(maxX * (DIAGONAL_FOV / HORIZONTAL_FOV));
                 float windowHeightPx = Math.round(maxY * (DIAGONAL_FOV / VERTICAL_FOV));
 
-                Log.i("Screen Metrics", " maxX:" + maxX + " maxY:" + maxY + " windowWidthPx:" + windowWidthPx + " windowHeightPx:" + windowHeightPx);
-
+                Log.v("Mapper", " maxX:" + maxX + " maxY:" + maxY + " windowWidthPx:" + windowWidthPx + " windowHeightPx:" + windowHeightPx);
+                Log.v("Mapper", " Planes in window:" + visibleAircraft.size());
                 // Get relative angles of flights from center of screen and transform from relative angle to
                 // x,y pixel coordinates with the center of the screen being the origin.
                 int count = 0;
+
                 for (Aircraft aircraft : visibleAircraft) {
                     double aircraftAzimuth = aircraft.getAzimuth();
                     double aircraftPitch = aircraft.getPitch();
+
+                    // Don't show planes that are essentially at or below the horizon
+                    if (aircraftPitch < .1) {
+                        Log.v("Mapper", "Skipped low plane pitch:" + aircraftPitch);
+                        continue;
+                    }
                     // Find relative "angular position" and convert from radians to pixels
                     // Handle cases where the azimuths are on opposite sides of the south direction
                     int x = 0;
@@ -115,13 +121,14 @@ public class FlightMapper implements Runnable{
 
                     // TODO If the plane falls outside of the screen draw on the edge to suggest the direction that it's in.
                     // Map point to screen
-                    Log.i("Point mapped", "Rel Az:" + (aircraft.getAzimuth() - azimuth) + " X pos:" + rotX + " Rel Pitch:" + (aircraft.getPitch() - pitchInv) + " Y pos:" + rotY);
+                    Log.v("Point mapped", "Rel Az:" + (aircraft.getAzimuth() - azimuth) + " X pos:" + rotX + " Rel Pitch:" + (aircraft.getPitch() - pitchInv) + " Y pos:" + rotY);
                     drawPlaneToScreenLocation(screenX, screenY, adjRoll, count);
                     count++;
                     if (count == 20) {
                         break;
                     }
                 }
+                Log.v("Mapper", " Count:" + count);
                 clearUnusedPlanes(count);
             }
         }

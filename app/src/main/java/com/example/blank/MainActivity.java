@@ -218,7 +218,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         FrameLayout main = (FrameLayout)findViewById(R.id.frameLayout);
         for (int i =0; i<20;i++){
             mPlaneIcons[i] = new ImageView(mContext);
-            mPlaneIcons[i].setImageResource(R.drawable.plane);
+            mPlaneIcons[i].setImageResource(R.drawable.plane_icon);
             mPlaneIcons[i].setVisibility(View.INVISIBLE);
             mPlaneIcons[i].setAdjustViewBounds(true);
             mPlaneIcons[i].setLayoutParams(new ViewGroup.LayoutParams(
