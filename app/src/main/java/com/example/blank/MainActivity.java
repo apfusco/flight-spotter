@@ -31,6 +31,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.os.HandlerThread;
 import android.util.Log;
 import android.util.Size;
@@ -39,9 +44,13 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -95,20 +104,23 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     // UI components
     private View view;
-    ImageView planeThing;
-    TextView x, y, z,lat,longi,alt,bThread,phiWin,thetaWin,testVisible;
-
+    private TextView x, y, z,lat,longi,alt,bThread,phiWin,thetaWin,testVisible;
     private float [] mRotationMatrix;
+    private ImageView planeThing;
     private FloatingActionButton fab_main, fab1_mail, fab2_share;
     private Animation fab_open, fab_close, fab_clock, fab_anticlock;
     Boolean isOpen = false;
 
+
     // Globals
+    public static ImageView [] mPlaneIcons = new ImageView[20];
     public static float[] mOrientation;
     public static Location mLocation;
+    public static Context mContext;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -201,6 +213,20 @@ public class MainActivity extends Activity implements SensorEventListener {
         // orientations values
         mRotationMatrix =  new float[16];
         mOrientation = new float[3];
+        mContext = getApplicationContext();
+        // Set up imageviews to use for planes
+        FrameLayout main = (FrameLayout)findViewById(R.id.frameLayout);
+        for (int i =0; i<20;i++){
+            mPlaneIcons[i] = new ImageView(mContext);
+            mPlaneIcons[i].setImageResource(R.drawable.plane);
+            mPlaneIcons[i].setVisibility(View.INVISIBLE);
+            mPlaneIcons[i].setAdjustViewBounds(true);
+            mPlaneIcons[i].setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            mPlaneIcons[i].setScaleType(ImageView.ScaleType.MATRIX);
+            main.addView(mPlaneIcons[i]);
+        }
 
         // get textviews
         x = findViewById(R.id.xVal);
@@ -251,6 +277,11 @@ public class MainActivity extends Activity implements SensorEventListener {
         // start calculation thread in background
         calcThread runner = new calcThread();
         new Thread(runner).start();
+
+        // Start flight mapping thread in the background once we get location
+        while (mLocation == null) {}
+        FlightMapper mapper = new FlightMapper();
+        new Thread(mapper).start();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -345,37 +376,12 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(final SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR && mLocation != null) {
             SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
-
             SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_X,
                     SensorManager.AXIS_Z, mRotationMatrix);
             SensorManager.getOrientation(mRotationMatrix, mOrientation);
-            float azimuth = mOrientation[0];
-            float pitch = mOrientation[1];
-            float roll = mOrientation[2];
-            float phi = azimuthToPhi(azimuth);
-            float theta = pitchToTheta(pitch);
-            float adjRoll = adjustRoll(roll);
-            double phiBound1 = ((phi - Math.toRadians(DIAGONAL_FOV)/2) % (Math.PI*2) + (2*Math.PI)) % (2*Math.PI);
-            double phiBound2 = (phi + Math.toRadians(DIAGONAL_FOV)/2) % (Math.PI*2);
-            double thetaBound1 = theta - Math.toRadians(DIAGONAL_FOV)/2;
-            double thetaBound2 = theta + Math.toRadians(DIAGONAL_FOV)/2;
-            x.setText("Phi: " + Float.toString(phi));
-            y.setText("Theta:       " + Float.toString(theta));
-            z.setText("Adjusted Roll:          " + Float.toString(adjRoll));
-            phiWin.setText("Phi Window: " + Float.toString((float)phiBound1) + " " + Float.toString((float)phiBound2));
-            thetaWin.setText("Theta Window: " + Float.toString((float)thetaBound1) + " " + Float.toString((float)thetaBound2));
-            AirTracker airTracker = new AirTracker();
-            // Query all flights in a square the size of the diagonal fov.
-            airTracker.
-            ArrayList<Aircraft> visibleAircraft = airTracker
-                    .getAircraftInWindow(0,0,2*Math.PI, Math.PI);
-            if (visibleAircraft.size() > 0) {
-                testVisible.setText("Test Visible: True");
-            } else {
-                testVisible.setText("Test Visible: False");
-            }
+            FlightMapper.newOrientation = true;
         }
     }
 
