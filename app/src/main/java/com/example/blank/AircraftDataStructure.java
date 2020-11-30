@@ -129,7 +129,8 @@ public class AircraftDataStructure {
         return inWindow;
     }
 
-    public void updateLocations(float posLon, float posLat, float posAlt) {
+
+    public void updateLocations(double posLon, double posLat, double posAlt) {
 
         for (int azIndex = 0; azIndex < ARRAY_LENGTH; azIndex++) {
             for (int pitIndex = 0; pitIndex < ARRAY_LENGTH; pitIndex++) {

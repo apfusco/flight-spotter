@@ -118,6 +118,12 @@ public class AirTracker {
         return this.mAircraft.getAircraftInWindow(minAzimuth, minPitch, maxAzimuth, maxPitch);
     }
 
+    public void updateLocations() {
+        this.mAircraft.updateLocations(MainActivity.mLocation.getLongitude(),
+                MainActivity.mLocation.getLatitude(),
+                MainActivity.mLocation.getAltitude());
+    }
+
     private JSONObject getAPILocations(double posLon, double posLat) {
         try {
             // Set parameters
