@@ -2,16 +2,19 @@ package com.example.blank;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.VectorDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -48,13 +51,23 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class MainActivity extends Activity implements SensorEventListener {
+public class MainActivity extends AppCompatActivity implements SensorEventListener, OnMapReadyCallback {
     // Google Pixel XL in 16:9 crop mode
     private final double VERTICAL_FOV = 66.9;
     private final double DIAGONAL_FOV = 74.32;
@@ -111,6 +124,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     private Animation fab_open, fab_close, fab_clock, fab_anticlock;
     Boolean isOpen = false;
 
+    SupportMapFragment mapFragment;
+    Boolean MapUp = false;
 
     // Globals
     public static ImageView [] mPlaneIcons = new ImageView[20];
@@ -123,6 +138,12 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+            mapFragment.getView().setVisibility(View.GONE);
+        }
 
         fab_main = findViewById(R.id.fab);
         fab1_mail = findViewById(R.id.fab1);
@@ -165,7 +186,14 @@ public class MainActivity extends Activity implements SensorEventListener {
         fab1_mail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // open map
+                // open map fragment
+                if (MapUp) {
+                    mapFragment.getView().setVisibility(View.GONE);
+                    MapUp = false;
+                } else {
+                    mapFragment.getView().setVisibility(View.VISIBLE);
+                    MapUp = true;
+                }
             }
         });
 
@@ -179,22 +207,27 @@ public class MainActivity extends Activity implements SensorEventListener {
                     @Override
                     public void onSystemUiVisibilityChange(int visibility) {
 
-                        if (decorFlag == true && isOpen == false) {
+                        if (decorFlag && (!isOpen || !MapUp)) {
                             new CountDownTimer(5000, 1000) {
                                 @Override
                                 public void onTick(long l) {}
                                 public void onFinish() {
                                     // When timer is finished
                                     // Execute your code here
-                                    if (isOpen == true) {
+                                    if (isOpen || MapUp) {
                                         // restart timer
+                                        //fab_main.setVisibility(View.VISIBLE);
+                                        fab_main.show();
                                         this.start();
                                     } else {
                                         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
                                         decorView.setSystemUiVisibility(uiOptions);
+                                        //fab_main.setVisibility(View.GONE);
+                                        fab_main.hide();
                                     }
                                 }
                             }.start();
+                            fab_main.show();
                         }
                         decorFlag = !decorFlag;
                     }
@@ -320,7 +353,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     private void updatePreview() {
         if(cameraDevice == null) {
-
+            return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
@@ -371,8 +404,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             startListening();
         }
     }
-
-
 
     @Override
     public void onSensorChanged(final SensorEvent event) {
@@ -467,6 +498,19 @@ public class MainActivity extends Activity implements SensorEventListener {
         // Your code here.
         Intent intent = new Intent(MainActivity.this, DialogActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        map.addMarker(new MarkerOptions().position(new LatLng(43, -89)).title("Marker"));
+
+        Marker planeMark = map.addMarker(
+                new MarkerOptions()
+                        .position(new LatLng(43.5, -89.5))
+                        .title("plane")
+                        //.icon(BitmapDescriptorFactory.fromBitmap( PLANE IMAGE? ))
+        );
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43, -89), 7));
     }
 
     // background thread that is always running and keeping track of time

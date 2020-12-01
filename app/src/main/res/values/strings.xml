@@ -1,11 +1,12 @@
 <resources>
     <string name="app_name">Blank</string>
-    <string name="longi"  >Long:    </string>
-    <string name="alt"    >Alt:     </string>
-    <string name="lat"    >Lat:     </string>
-    <string name="roll"   >Roll:    </string>
-    <string name="pitch"  >Pitch:   </string>
+    <string name="longi">Long:    </string>
+    <string name="alt">Alt:     </string>
+    <string name="lat">Lat:     </string>
+    <string name="roll">Roll:    </string>
+    <string name="pitch">Pitch:   </string>
     <string name="azimuth">Azimuth: </string>
     <string name="counter">counter:</string>
     <string name="btn_finish_dialog_label">close</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
