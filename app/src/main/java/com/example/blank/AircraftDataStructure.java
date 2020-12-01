@@ -1,5 +1,9 @@
 package com.example.blank;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -11,6 +15,7 @@ public class AircraftDataStructure {
 
     private ArrayList<Aircraft>[][] mAircraftBuckets;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public AircraftDataStructure() {
         this.mAircraftBuckets = new ArrayList[ARRAY_LENGTH][ARRAY_LENGTH];
         for (int i = 0; i < ARRAY_LENGTH; i++) {
@@ -31,7 +36,7 @@ public class AircraftDataStructure {
                 time,
                 longitude,
                 latitude,
-                AirTracker.getEarthRadius(latitude) + 3000,
+                 3000,
                 false,
                 0,
                 0,
@@ -41,7 +46,8 @@ public class AircraftDataStructure {
                 "Borat",
                 false,
                 0);
-        testAircraft.updateSphericalPosition(MainActivity.mLocation.getLongitude(), MainActivity.mLocation.getLatitude(), AirTracker.getEarthRadius(latitude) + MainActivity.mLocation.getAltitude());
+        testAircraft.updateSphericalPosition(MainActivity.mLocation.getLongitude(), MainActivity.mLocation.getLatitude(),
+                MainActivity.mLocation.getAltitude());
         addAircraft(testAircraft);
     }
 
@@ -123,7 +129,9 @@ public class AircraftDataStructure {
         return inWindow;
     }
 
-    public void updateLocations(float posLon, float posLat, float posAlt) {
+
+    public void updateLocations(double posLon, double posLat, double posAlt) {
+
         for (int azIndex = 0; azIndex < ARRAY_LENGTH; azIndex++) {
             for (int pitIndex = 0; pitIndex < ARRAY_LENGTH; pitIndex++) {
                 for (int i = 0; i < this.mAircraftBuckets[azIndex][pitIndex].size(); i++) {
@@ -135,8 +143,17 @@ public class AircraftDataStructure {
                         this.mAircraftBuckets[aircraft.getAzimuthIndex()][aircraft.getPitchIndex()]
                                 .add(aircraft);
                         this.mAircraftBuckets[azIndex][pitIndex].remove(i--);
+
                     }
                 }
+            }
+        }
+    }
+
+    public void clearAircraft() {
+        for (int i = 0; i < this.mAircraftBuckets.length; i++) {
+            for (int j = 0; j < this.mAircraftBuckets[i].length; j++) {
+                this.mAircraftBuckets[i][j].clear();
             }
         }
     }

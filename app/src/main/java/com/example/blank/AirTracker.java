@@ -1,8 +1,11 @@
 package com.example.blank;
 
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +37,7 @@ public class AirTracker {
     private AircraftDataStructure mAircraft;
     private URL mUrl;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public AirTracker() {
         this.mAircraft = new AircraftDataStructure();
     }
@@ -45,6 +49,7 @@ public class AirTracker {
                 Log.i("API", jsonObject.toString()); // TODO: Remove this line
                 int time = jsonObject.getInt("time");
                 JSONArray states = jsonObject.getJSONArray("states");
+                this.mAircraft.clearAircraft();
                 for (int i = 0; i < states.length(); i++) {
                     JSONArray state = states.getJSONArray(i);
                     // Handle any values that might be null
@@ -112,6 +117,16 @@ public class AirTracker {
                                                    double maxAzimuth,
                                                    double maxPitch) {
         return this.mAircraft.getAircraftInWindow(minAzimuth, minPitch, maxAzimuth, maxPitch);
+    }
+
+    public ArrayList<Aircraft> getAllAircraft() {
+        return this.getAircraftInWindow(-Math.PI, -Math.PI / 2, Math.PI, Math.PI / 2);
+    }
+
+    public void updateLocations() {
+        this.mAircraft.updateLocations(MainActivity.mLocation.getLongitude(),
+                MainActivity.mLocation.getLatitude(),
+                MainActivity.mLocation.getAltitude());
     }
 
     private JSONObject getAPILocations(double posLon, double posLat) {
