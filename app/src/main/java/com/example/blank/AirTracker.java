@@ -119,6 +119,10 @@ public class AirTracker {
         return this.mAircraft.getAircraftInWindow(minAzimuth, minPitch, maxAzimuth, maxPitch);
     }
 
+    public ArrayList<Aircraft> getAllAircraft() {
+        return this.getAircraftInWindow(-Math.PI, -Math.PI / 2, Math.PI, Math.PI / 2);
+    }
+
     public void updateLocations() {
         this.mAircraft.updateLocations(MainActivity.mLocation.getLongitude(),
                 MainActivity.mLocation.getLatitude(),
