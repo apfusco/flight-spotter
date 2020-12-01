@@ -149,4 +149,12 @@ public class AircraftDataStructure {
             }
         }
     }
+
+    public void clearAircraft() {
+        for (int i = 0; i < this.mAircraftBuckets.length; i++) {
+            for (int j = 0; j < this.mAircraftBuckets[i].length; j++) {
+                this.mAircraftBuckets[i][j].clear();
+            }
+        }
+    }
 }

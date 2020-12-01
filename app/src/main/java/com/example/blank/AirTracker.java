@@ -49,6 +49,7 @@ public class AirTracker {
                 Log.i("API", jsonObject.toString()); // TODO: Remove this line
                 int time = jsonObject.getInt("time");
                 JSONArray states = jsonObject.getJSONArray("states");
+                this.mAircraft.clearAircraft();
                 for (int i = 0; i < states.length(); i++) {
                     JSONArray state = states.getJSONArray(i);
                     // Handle any values that might be null
