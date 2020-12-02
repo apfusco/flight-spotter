@@ -30,7 +30,7 @@ public class AirTracker {
     private static final String URL_STRING = "https://opensky-network.org/api";
     public static final int CONNECTION_TIMEOUT = 5000;
     public static final int READ_TIMEOUT = 5000;
-    public static final int VISUAL_DISTANCE = 92600; // In meters
+    public static final int VISUAL_DISTANCE = 50000; // In meters
     private static final int EARTH_RADIUS_EQUATOR = 6378137;
     private static final int EARTH_RADIUS_POLES = 6356752;
 
