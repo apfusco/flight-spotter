@@ -6,7 +6,7 @@ import java.util.Calendar;
 
 public class Aircraft {
 
-    // From OpenSky SPI
+    // From OpenSky API
     private int mTimeQuery;        // Time that the query was made (applies to position)
     private int mIcao24;           // 24-bit address of transponder
     private String mCallsign;      // Should be 8 characters (can be null)
@@ -25,6 +25,10 @@ public class Aircraft {
     private String mSquawk;        // Transponder code of the squawk (can be null)
     private boolean mSpi;          // Special purpose indicator
     private int mPositionSource;   // {0=ADS-B, 1=ASTERIX, 2=MLAT}
+
+    // OpenSky airport query
+    private String mEstDepartureAirport;
+    private String mEstArrivalAirport;
 
     // Updated location
     private float mUpdatedLat;
@@ -88,9 +92,27 @@ public class Aircraft {
 
     public double getPitch() { return this.mPitch; };
 
+    public int getIcao24() { return this.mIcao24; }
+
+    public String getOriginCountry() { return this.mOriginCountry; }
+
     public String getCallsign() { return this.mCallsign; }
 
     public float getTrueTrack() { return this.mTrueTrack; }
+
+    public String getEstDepartureAirport() { return this.mEstDepartureAirport; }
+
+    public String getEstArrivalAirport() { return this.mEstArrivalAirport; }
+
+    public void setEstDepartureAirport(String estDepartureAirport) {
+        System.out.println(estDepartureAirport); // TODO
+        this.mEstDepartureAirport = estDepartureAirport;
+    }
+
+    public void setEstArrivalAirport(String estArrivalAirport) {
+        System.out.println(estArrivalAirport); // TODO
+        this.mEstArrivalAirport = estArrivalAirport;
+    }
 
     public float getHeading() {
         if (this.mTrueTrack > 180)

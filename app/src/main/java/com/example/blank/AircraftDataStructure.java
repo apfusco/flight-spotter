@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -131,6 +132,8 @@ public class AircraftDataStructure {
 
 
     public void updateLocations(double posLon, double posLat, double posAlt) {
+
+        int test = 0;
 
         for (int azIndex = 0; azIndex < ARRAY_LENGTH; azIndex++) {
             for (int pitIndex = 0; pitIndex < ARRAY_LENGTH; pitIndex++) {

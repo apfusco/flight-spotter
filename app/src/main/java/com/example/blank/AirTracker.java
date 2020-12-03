@@ -2,7 +2,6 @@ package com.example.blank;
 
 import android.net.Uri;
 import android.os.Build;
-import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
@@ -13,17 +12,12 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Dictionary;
+import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 
 public class AirTracker {
 
@@ -35,11 +29,13 @@ public class AirTracker {
     private static final int EARTH_RADIUS_POLES = 6356752;
 
     private AircraftDataStructure mAircraft;
+    private HashMap<Integer, AircraftInfo> cache;
     private URL mUrl;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public AirTracker() {
         this.mAircraft = new AircraftDataStructure();
+        this.cache = new HashMap<>();
     }
 
     public void reloadLocations(double posLon, double posLat, float posAlt) {
@@ -64,7 +60,7 @@ public class AirTracker {
                     float geoAltitude = 0;
                     String squawk = null;
                     if (state.getString(1) != null)
-                        callsign = state.getString(1);
+                        callsign = state.getString(1).trim();
                     if (!state.isNull(3)) // FIXME
                         timePosition = state.getInt(3);
                     if (!state.isNull(5))
@@ -103,12 +99,89 @@ public class AirTracker {
                             state.getBoolean(15),
                             state.getInt(16));
                     aircraft.updateSphericalPosition(posLon, posLat, posAlt);
+                    // updateMoreInfo(aircraft);
                     this.mAircraft.addAircraft(aircraft);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
                 return;
             }
+        }
+    }
+
+    public void updateMoreInfo(Aircraft aircraft) {
+        // FIXME: This method is broken because the API doesn't work
+        System.out.println("\n\n\nupdateCache()\n\n\n"); // TODO
+        if (this.cache.containsKey(aircraft.getIcao24())) {
+            // Aircraft is already in cache.
+            AircraftInfo info = this.cache.get(aircraft.getIcao24());
+            aircraft.setEstDepartureAirport(info.getEstDepartureAirport());
+            aircraft.setEstArrivalAirport(info.getEstArrivalAirport());
+            return;
+        }
+
+        try {
+            Thread.sleep(10); // Don't overwhelm the API.
+            int time = (new Long(Calendar.getInstance().getTime().getTime() / 1000))
+                    .intValue();
+            int timeDiff = 60 * 60 * 24 * 3; // 3 days
+            Uri.Builder builder = new Uri.Builder()
+                    .appendQueryParameter("icao24", Integer.toString(aircraft.getIcao24(), 16))
+                    .appendQueryParameter("begin", Integer.toString(time - timeDiff))
+                    .appendQueryParameter("end", Integer.toString(time + timeDiff));
+            String params = builder.build().getEncodedQuery();
+            Log.i("QUERY", params);
+
+            // Make HTTP request
+            HttpURLConnection connection;
+            URL url = new URL(URL_STRING + "/flights/aircraft" + "?" + params);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(CONNECTION_TIMEOUT * 10);
+            connection.setReadTimeout(READ_TIMEOUT * 10);
+            connection.setDoInput(true);
+            connection.connect();
+            InputStreamReader inputStreamReader =
+                    new InputStreamReader(connection.getInputStream());
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            String responseString = "";
+            String line;
+
+            while (true) {
+                line = bufferedReader.readLine();
+                if (line == null)
+                    break;
+                responseString += line;
+            }
+
+            JSONTokener jsonTokener = new JSONTokener(responseString);
+            connection.disconnect();
+            JSONArray responseJSON = new JSONArray(jsonTokener);
+
+            AircraftInfo info = new AircraftInfo(aircraft.getIcao24(), aircraft.getCallsign(),
+                    aircraft.getOriginCountry());
+
+            if ((responseJSON.length() > 0)
+                    && (!responseJSON.getJSONObject(0).isNull("estDepartureAirport"))) {
+                String estDepAirport = responseJSON.getJSONObject(0)
+                        .getString("estDepartureAirport");
+                info.setEstDepartureAirport(estDepAirport);
+                aircraft.setEstDepartureAirport(estDepAirport);
+            }
+
+            if ((responseJSON.length() > 0)
+                    && (!responseJSON.getJSONObject(0).isNull("estArrivalAirport"))) {
+                String estArivAirport = responseJSON.getJSONObject(0)
+                        .getString("estArrivalAirport");
+                info.setEstArrivalAirport(estArivAirport);
+                aircraft.setEstArrivalAirport(estArivAirport);
+            }
+
+            this.cache.put(aircraft.getIcao24(), info);
+
+        } catch (Exception e) {
+            // This might happen every once in a while
+            e.printStackTrace();
         }
     }
 
