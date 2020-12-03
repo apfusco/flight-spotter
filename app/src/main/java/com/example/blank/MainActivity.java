@@ -196,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
         });
+        fab_main.hide(); // hide button on boot, should just be camera view to user until clicked
 
         // keep 16:9 ratio by removing to bar
         decorView = getWindow().getDecorView();
