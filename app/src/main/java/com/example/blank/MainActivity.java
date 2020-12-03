@@ -104,13 +104,14 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     // UI components
     private View view;
-    private TextView x, y, z,lat,longi,alt,bThread,phiWin,thetaWin,testVisible;
     private float [] mRotationMatrix;
     private ImageView planeThing;
     private FloatingActionButton fab_main, fab1_mail, fab2_share;
     private Animation fab_open, fab_close, fab_clock, fab_anticlock;
-    Boolean isOpen = false;
-
+    private Boolean isOpen = false;
+    private FrameLayout dataFrame;
+    private ImageView exitButton;
+    private int selectedPlane;
 
     // Globals
     public static ImageView [] mPlaneIcons = new ImageView[20];
@@ -200,6 +201,17 @@ public class MainActivity extends Activity implements SensorEventListener {
                     }
                 });
 
+        // Hide flight data for now
+        dataFrame = findViewById(R.id.dataFrame);
+        exitButton = findViewById(R.id.dataExit);
+        dataFrame.setVisibility(View.INVISIBLE);
+        exitButton.setVisibility(View.INVISIBLE);
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // set stop to false and spawn new counter thread and
+                exitDialog(v);
+            }
+        });
         // system services
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         sensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
@@ -216,7 +228,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         mContext = getApplicationContext();
         // Set up imageviews to use for planes
         FrameLayout main = (FrameLayout)findViewById(R.id.frameLayout);
-        for (int i =0; i<20;i++){
+        for (int i =0; i<20;i++) {
             mPlaneIcons[i] = new ImageView(mContext);
             mPlaneIcons[i].setImageResource(R.drawable.plane_icon);
             mPlaneIcons[i].setVisibility(View.INVISIBLE);
@@ -225,20 +237,15 @@ public class MainActivity extends Activity implements SensorEventListener {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
             mPlaneIcons[i].setScaleType(ImageView.ScaleType.MATRIX);
+            mPlaneIcons[i].setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    // set stop to false and spawn new counter thread and
+                    startDialog(v);
+                }
+            });
             main.addView(mPlaneIcons[i]);
         }
 
-        // get textviews
-        x = findViewById(R.id.xVal);
-        y = findViewById(R.id.yVal);
-        z = findViewById(R.id.zVal);
-        lat = findViewById(R.id.latVal);
-        longi = findViewById(R.id.longVal);
-        alt = findViewById(R.id.altVal);
-        bThread = findViewById(R.id.bThread);
-        phiWin = findViewById(R.id.phiWindow);
-        thetaWin = findViewById(R.id.thetaWindow);
-        testVisible = findViewById(R.id.testAircraftVisible);
 
         // register sensor manager
         sensorManager.registerListener(this,
@@ -249,7 +256,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
-                updateLocationInfo(location);
             }
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {}
@@ -270,13 +276,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0,locationListener);
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if(location!=null) {
-            updateLocationInfo(location);
             mLocation = location;
         }
-
-        // start calculation thread in background
-        calcThread runner = new calcThread();
-        new Thread(runner).start();
 
         // Start flight mapping thread in the background once we get location
         while (mLocation == null) {}
@@ -385,12 +386,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         }
     }
 
-    public void updateLocationInfo(Location location) {
-        lat.setText("lat:        " + location.getLatitude());
-        longi.setText("longi:   " + location.getLongitude());
-        alt.setText("alt:       " + location.getAltitude());
-    }
-
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
@@ -464,45 +459,16 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
     public void startDialog(View v) {
-        // Your code here.
-        Intent intent = new Intent(MainActivity.this, DialogActivity.class);
-        startActivity(intent);
+        // Populate scroll view
+        int icao24 = v.getId();
+
+        // Reveal scroll view and exit button
+
     }
 
-    // background thread that is always running and keeping track of time
-    class calcThread implements Runnable {
-        private long currentCount;
-        private Matrix myMat = new Matrix();
-
-        // constructor method
-        public calcThread() {
-            currentCount = 0;
-        }
-
-        // main method for runnable
-        @Override
-        public void run() {
-            // when spawned always run in background
-            while (true) {
-                // keep thread at a low load
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                currentCount += 1;
-                myMat.setTranslate(150, 1000);
-                myMat.postRotate(currentCount*7, 675, 1000);
-
-                // post to the main handler
-                mainHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        bThread.setText("count: " + currentCount);
-                    }
-                });
-            }
-        }
+    private void exitDialog(View v) {
+        dataFrame.setVisibility(View.INVISIBLE);
+        exitButton.setVisibility(View.INVISIBLE);
     }
 
     private float azimuthToPhi(float az) {

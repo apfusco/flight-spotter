@@ -28,7 +28,9 @@ public class FlightMapper implements Runnable{
     private final double DIAGONAL_FOV = 74.32;
     private final double HORIZONTAL_FOV = 40.77;
     private final double FIVE_MINS = 300000;
+    private final double ONE_SEC = 1000;
     private long lastChecked = 0;
+    private long lastUpdate = 0;
     private AirTracker airTracker = new AirTracker();
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -39,6 +41,11 @@ public class FlightMapper implements Runnable{
             if (currTime > lastChecked + FIVE_MINS) {
                 lastChecked = currTime;
                 airTracker.reloadLocations(MainActivity.mLocation.getLongitude(), MainActivity.mLocation.getLatitude(), (float) MainActivity.mLocation.getAltitude());
+            }
+
+            if (currTime > lastUpdate + ONE_SEC) {
+                lastChecked = currTime;
+                airTracker.updateLocations();
             }
 
             if (newOrientation) {
@@ -122,7 +129,7 @@ public class FlightMapper implements Runnable{
                     // TODO If the plane falls outside of the screen draw on the edge to suggest the direction that it's in.
                     // Map point to screen
                     Log.v("Point mapped", "Rel Az:" + (aircraft.getAzimuth() - azimuth) + " X pos:" + rotX + " Rel Pitch:" + (aircraft.getPitch() - pitchInv) + " Y pos:" + rotY);
-                    drawPlaneToScreenLocation(screenX, screenY, adjRoll, count);
+                    drawPlaneToScreenLocation(screenX, screenY, adjRoll, count, aircraft.getmIcao24());
                     count++;
                     if (count == 20) {
                         break;
@@ -149,7 +156,7 @@ public class FlightMapper implements Runnable{
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void drawPlaneToScreenLocation(float screenX, float screenY, float adjRollRadians, final int count){
+    private void drawPlaneToScreenLocation(float screenX, float screenY, float adjRollRadians, final int count, final int icao24){
         final Matrix myMat = new Matrix();
         myMat.setTranslate(screenY, screenX);
         myMat.postRotate((float) Math.toDegrees(-adjRollRadians), screenY, screenX);
@@ -159,6 +166,7 @@ public class FlightMapper implements Runnable{
              public void run() {
                  MainActivity.mPlaneIcons[count].setVisibility(View.VISIBLE);
                  MainActivity.mPlaneIcons[count].setImageMatrix(myMat);
+                 MainActivity.mPlaneIcons[count].setId(icao24);
              }
          });
 

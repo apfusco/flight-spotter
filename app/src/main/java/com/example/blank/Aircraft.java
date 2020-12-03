@@ -78,6 +78,8 @@ public class Aircraft {
 
     }
 
+    public int getmIcao24() {return mIcao24;}
+
     public int getAzimuthIndex() { return this.mAzimuthIndex; }
 
     public int getPitchIndex() { return this.mPitchIndex; }
