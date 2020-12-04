@@ -109,34 +109,21 @@ public class AirTracker {
         }
     }
 
-    public void updateMoreInfo(Aircraft aircraft) {
-        // FIXME: This method is broken because the API doesn't work
-        System.out.println("\n\n\nupdateCache()\n\n\n"); // TODO
-        if (this.cache.containsKey(aircraft.getIcao24())) {
-            // Aircraft is already in cache.
-            AircraftInfo info = this.cache.get(aircraft.getIcao24());
-            aircraft.setEstDepartureAirport(info.getEstDepartureAirport());
-            aircraft.setEstArrivalAirport(info.getEstArrivalAirport());
-            return;
-        }
-
+    /**
+     *
+     * @param urlString
+     * @param requestType
+     * @param params
+     * @return JSONTokener of response, or null on error.
+     */
+    private JSONTokener makeRequest(String urlString, String requestType, String params) {
+        JSONTokener jsonTokener = null;
         try {
-            Thread.sleep(10); // Don't overwhelm the API.
-            int time = (new Long(Calendar.getInstance().getTime().getTime() / 1000))
-                    .intValue();
-            int timeDiff = 60 * 60 * 24 * 3; // 3 days
-            Uri.Builder builder = new Uri.Builder()
-                    .appendQueryParameter("icao24", Integer.toString(aircraft.getIcao24(), 16))
-                    .appendQueryParameter("begin", Integer.toString(time - timeDiff))
-                    .appendQueryParameter("end", Integer.toString(time + timeDiff));
-            String params = builder.build().getEncodedQuery();
-            Log.i("QUERY", params);
-
             // Make HTTP request
             HttpURLConnection connection;
-            URL url = new URL(URL_STRING + "/flights/aircraft" + "?" + params);
+            URL url = new URL(urlString + "?" + params);
             connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
+            connection.setRequestMethod(requestType);
             connection.setConnectTimeout(CONNECTION_TIMEOUT * 10);
             connection.setReadTimeout(READ_TIMEOUT * 10);
             connection.setDoInput(true);
@@ -154,8 +141,39 @@ public class AirTracker {
                 responseString += line;
             }
 
-            JSONTokener jsonTokener = new JSONTokener(responseString);
+            jsonTokener = new JSONTokener(responseString);
             connection.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jsonTokener;
+    }
+
+    public void updateMoreInfo(Aircraft aircraft) {
+        // FIXME: This method is broken because the API doesn't work
+        System.out.println("\n\n\nupdateCache()\n\n\n"); // TODO
+        if (this.cache.containsKey(aircraft.getIcao24())) {
+            // Aircraft is already in cache.
+            AircraftInfo info = this.cache.get(aircraft.getIcao24());
+            aircraft.setEstDepartureAirport(info.getEstDepartureAirport());
+            aircraft.setEstArrivalAirport(info.getEstArrivalAirport());
+            return;
+        }
+
+        try {
+            // Thread.sleep(10); // Don't overwhelm the API.
+            int time = (new Long(Calendar.getInstance().getTime().getTime() / 1000))
+                    .intValue();
+            int timeDiff = 60 * 60 * 24 * 3; // 3 days
+            Uri.Builder builder = new Uri.Builder()
+                    .appendQueryParameter("icao24", Integer.toString(aircraft.getIcao24(), 16))
+                    .appendQueryParameter("begin", Integer.toString(time - timeDiff))
+                    .appendQueryParameter("end", Integer.toString(time + timeDiff));
+            String params = builder.build().getEncodedQuery();
+            Log.i("QUERY", params);
+
+            JSONTokener jsonTokener = this.makeRequest((URL_STRING + "/flights/aircraft"), "GET",
+                    params);
             JSONArray responseJSON = new JSONArray(jsonTokener);
 
             AircraftInfo info = new AircraftInfo(aircraft.getIcao24(), aircraft.getCallsign(),
@@ -223,30 +241,8 @@ public class AirTracker {
             String params = builder.build().getEncodedQuery();
             Log.i("QUERY", params);
 
-            // Make HTTP request
-            HttpURLConnection connection;
-            URL url = new URL(URL_STRING + "/states/all" + "?" + params);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(CONNECTION_TIMEOUT);
-            connection.setReadTimeout(READ_TIMEOUT);
-            connection.setDoInput(true);
-            connection.connect();
-            InputStreamReader inputStreamReader =
-                    new InputStreamReader(connection.getInputStream());
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String responseString = "";
-            String line;
-
-            while (true) {
-                line = bufferedReader.readLine();
-                if (line == null)
-                    break;
-                responseString += line;
-            }
-
-            JSONTokener jsonTokener = new JSONTokener(responseString);
-            connection.disconnect();
+            JSONTokener jsonTokener = this.makeRequest((URL_STRING + "/states/all"), "GET",
+                    params);
             return new JSONObject(jsonTokener);
         } catch (Exception e) {
             // As of now, this just happens on some queries
