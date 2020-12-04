@@ -2,9 +2,9 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
         <item>
             <shape android:shape="oval">
-                <solid android:color="@color/cardview_dark_background" />
-                <size android:width="30dp" android:height="30dp" />
+                <solid android:color="#EDE9E0" />
+                <size android:width="20dp" android:height="20dp" />
             </shape>
         </item>
-    <item android:drawable="@android:drawable/ic_menu_close_clear_cancel"/>
+    <item android:drawable="@android:drawable/ic_menu_close_clear_cancel" android:width="17dp" android:height="17dp" android:gravity="center"/>
     </layer-list>

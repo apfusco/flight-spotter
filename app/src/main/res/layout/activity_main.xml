@@ -20,6 +20,21 @@
     </FrameLayout>
 
     <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/frame_layout">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            class="com.google.android.gms.maps.SupportMapFragment" />
+
+    </FrameLayout>
+
+    <include layout="@layout/content_main" />
+
+    <FrameLayout
         android:id="@+id/dataFrame"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -27,9 +42,10 @@
         <ScrollView
             style="@android:style/Widget.DeviceDefault.Light.ScrollView"
             android:layout_width="300dp"
-            android:layout_height="550dp"
+            android:layout_height="574dp"
 
-            android:layout_gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp"
             android:background="@drawable/frame">
 
             <LinearLayout
@@ -49,7 +65,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Flight Information:" />
+                    android:text="Flight Information:"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -98,7 +115,7 @@
                             android:text="City" />
 
                         <TextView
-                            android:id="@+id/textView8"
+                            android:id="@+id/arrAirport"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Airport" />
@@ -109,7 +126,8 @@
                     android:id="@+id/aircraftInformation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Aircraft Information:" />
+                    android:text="Aircraft Information:"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
                 <TextView
                     android:id="@+id/callsign"
@@ -127,7 +145,8 @@
                     android:id="@+id/aircraftStatus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Aircraft Status:" />
+                    android:text="Aircraft Status:"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
                 <TextView
                     android:id="@+id/altitude"
@@ -161,6 +180,7 @@
 
             </LinearLayout>
         </ScrollView>
+
     </FrameLayout>
 
     <ImageView
@@ -168,25 +188,22 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="325dp"
-        android:layout_marginLeft="325dp"
-        android:layout_marginTop="75dp"
+        android:layout_marginLeft="340dp"
+        android:layout_marginTop="40dp"
         android:src="@drawable/circle_button" />
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/frame_layout">
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TAP screen to see more information about a flight. " />
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/map"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            class="com.google.android.gms.maps.SupportMapFragment" />
-
-    </FrameLayout>
-
-    <include layout="@layout/content_main" />
-
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="CENTER a plane in the screen to highlight it." />
 
 
 </RelativeLayout>

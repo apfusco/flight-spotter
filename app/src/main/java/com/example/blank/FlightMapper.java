@@ -27,18 +27,24 @@ public class FlightMapper implements Runnable{
     private final double VERTICAL_FOV = 66.9;
     private final double DIAGONAL_FOV = 74.32;
     private final double HORIZONTAL_FOV = 40.77;
-    private final double FIVE_MINS = 300000;
+    private final double TWO_MINS = 120000;
     private final double ONE_SEC = 1000;
     private long lastChecked = 0;
     private long lastUpdate = 0;
+    private boolean once = false;
+    private int maxX = 0;
+    private int maxY = 0;
+    private float windowWidthPx = 0;
+    private float windowHeightPx = 0;
+
     private AirTracker airTracker = new AirTracker();
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void run () {
         while (true) {
-            // Query every 5 minutes so your IP doesn't get banned by the API
+            // Query every 2 minutes so your IP doesn't get banned by the API
             long currTime = Calendar.getInstance().getTimeInMillis();
-            if (currTime > lastChecked + FIVE_MINS) {
+            if (currTime > lastChecked + TWO_MINS) {
                 lastChecked = currTime;
                 airTracker.reloadLocations(MainActivity.mLocation.getLongitude(), MainActivity.mLocation.getLatitude(), (float) MainActivity.mLocation.getAltitude());
             }
@@ -78,26 +84,30 @@ public class FlightMapper implements Runnable{
 
                 // Query all flights in a square the size of the diagonal fov.
                 // airTracker.
-                ArrayList<Aircraft> visibleAircraft = airTracker
+                final ArrayList<Aircraft> visibleAircraft = airTracker
                         .getAircraftInWindow(azBound1, pitchBound1, azBound2, pitchBound2);
                 // Do a 2-D mapping of angles of flights relative to angle of phone to positions in a 2-D
                 // square of positions on the screen.
-                WindowManager windowManager = (WindowManager) MainActivity.mContext
-                        .getSystemService(Context.WINDOW_SERVICE);
-                DisplayMetrics metrics = new DisplayMetrics();
-                windowManager.getDefaultDisplay().getMetrics(metrics);
-                float maxX = metrics.widthPixels;
-                float maxY = metrics.heightPixels;
+                if (!once) {
+                    once = true;
+                    WindowManager windowManager = (WindowManager) MainActivity.mContext
+                            .getSystemService(Context.WINDOW_SERVICE);
+                    DisplayMetrics metrics = new DisplayMetrics();
+                    windowManager.getDefaultDisplay().getMetrics(metrics);
+                    maxX = metrics.widthPixels;
+                    maxY = metrics.heightPixels;
 
-                float windowWidthPx = Math.round(maxX * (DIAGONAL_FOV / HORIZONTAL_FOV));
-                float windowHeightPx = Math.round(maxY * (DIAGONAL_FOV / VERTICAL_FOV));
+                    windowWidthPx = Math.round(maxX * (DIAGONAL_FOV / HORIZONTAL_FOV));
+                    windowHeightPx = Math.round(maxY * (DIAGONAL_FOV / VERTICAL_FOV));
+                }
 
-                Log.v("Mapper", " maxX:" + maxX + " maxY:" + maxY + " windowWidthPx:" + windowWidthPx + " windowHeightPx:" + windowHeightPx);
+                //Log.v("Mapper", " maxX:" + maxX + " maxY:" + maxY + " windowWidthPx:" + windowWidthPx + " windowHeightPx:" + windowHeightPx);
                 Log.v("Mapper", " Planes in window:" + visibleAircraft.size());
                 // Get relative angles of flights from center of screen and transform from relative angle to
                 // x,y pixel coordinates with the center of the screen being the origin.
                 int count = 0;
-
+                int closestPlane = -1;
+                float minDist = 100000000;
                 for (Aircraft aircraft : visibleAircraft) {
                     double aircraftAzimuth = aircraft.getAzimuth();
                     double aircraftPitch = aircraft.getPitch();
@@ -126,9 +136,13 @@ public class FlightMapper implements Runnable{
                     float screenX = Math.round(rotX + maxY / 2);
                     float screenY = Math.round(rotY + maxX / 2);
 
-                    // TODO If the plane falls outside of the screen draw on the edge to suggest the direction that it's in.
-                    // Map point to screen
                     Log.v("Point mapped", "Rel Az:" + (aircraft.getAzimuth() - azimuth) + " X pos:" + rotX + " Rel Pitch:" + (aircraft.getPitch() - pitchInv) + " Y pos:" + rotY);
+                    float relDist = (float) Math.sqrt(Math.pow(aircraft.getAzimuth() - azimuth,2) + Math.pow(aircraft.getPitch() - pitch,2));
+                    if (relDist < minDist) {
+                        minDist = relDist;
+                        closestPlane = count;
+                    }
+                    // Map point to screen
                     drawPlaneToScreenLocation(screenX, screenY, adjRoll, count, aircraft.getmIcao24());
                     count++;
                     if (count == 20) {
@@ -137,10 +151,32 @@ public class FlightMapper implements Runnable{
                 }
                 Log.v("Mapper", " Count:" + count);
                 clearUnusedPlanes(count);
+                final int asdfa = closestPlane;
+                final  int adfasdfa = count;
+                if (closestPlane != -1) {
+                    // Redraw closest plane to middle on top for clicking purposes
+                    MainActivity.mPlaneIcons[closestPlane].post(new Runnable() {
+                        @Override
+                        public void run() {
+                            MainActivity.mPlaneIcons[asdfa].setElevation(1);
+                            for (int i =0;i < adfasdfa;i++){
+                                if (i == asdfa) {
+                                    continue;
+                                }
+                                MainActivity.mPlaneIcons[i].setImageResource(R.drawable.plane_icon);
+                                MainActivity.mPlaneIcons[i].setElevation(0);
+                            }
+                            MainActivity.mPlaneIcons[asdfa].setImageResource(R.drawable.center_plane_icon);
+                            MainActivity.mPlaneIcons[asdfa].setElevation(1);
+                        }
+                    });
+                }
             }
         }
     }
-
+    public AirTracker getAirTracker(){
+        return airTracker;
+    }
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void clearUnusedPlanes(int count){
         // Clear all plane ImageViews from the screen
@@ -171,14 +207,7 @@ public class FlightMapper implements Runnable{
          });
 
     }
-    //Log.i("Point mapped", "Rel Az:" + (aircraft.getAzimuth() - azimuth) + " X pos:" + screenX + " Rel Pitch:" + screenY + "Y pos"+);
-    // post to the main handler
-    //                mainHandler.post(new Runnable() {
-    ////                    @Override
-    ////                    public void run() {
-    ////                         ;
-    ////                    }
-    ////                });
+
     private float azimuthToPhi(float az) {
         return (float) ( ((Math.PI/2 - az) % (2*Math.PI) + (2*Math.PI)) % (2*Math.PI) );
     }
