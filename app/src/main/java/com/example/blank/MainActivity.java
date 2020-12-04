@@ -134,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private long lastChecked;
 
     // Globals
+    public static TextView callsignIndicator;
     public static ImageView [] mPlaneIcons = new ImageView[20];
     public static float[] mOrientation;
     public static Location mLocation;
@@ -153,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mapFragment.getView().setVisibility(View.GONE);
         }
 
+        callsignIndicator = findViewById(R.id.callsignIndicator);
         fab_main = findViewById(R.id.fab);
         fab1_mail = findViewById(R.id.fab1);
         fab2_share = findViewById(R.id.fab2);

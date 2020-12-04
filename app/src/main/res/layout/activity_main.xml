@@ -24,6 +24,19 @@
         android:layout_height="match_parent"
         android:id="@+id/frame_layout">
 
+        <TextView
+            android:id="@+id/callsignIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="90dp"
+            android:alpha=".75"
+            android:background="#5A5A5A"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="           "
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#FFFFFF" />
+
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/map"
             android:layout_width="match_parent"
@@ -194,15 +207,17 @@
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#B8B6B6"
         android:text="TAP screen to see more information about a flight. " />
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="19dp"
+        android:background="#B8B6B6"
         android:text="CENTER a plane in the screen to highlight it." />
 
 

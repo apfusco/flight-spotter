@@ -42,9 +42,9 @@ public class FlightMapper implements Runnable{
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void run () {
         while (true) {
-            // Query every 2 minutes so your IP doesn't get banned by the API
+            // Query every 10 sec so your IP doesn't get banned by the API
             long currTime = Calendar.getInstance().getTimeInMillis();
-            if (currTime > lastChecked + TWO_MINS) {
+            if (currTime > lastChecked + ONE_SEC*10) {
                 lastChecked = currTime;
                 airTracker.reloadLocations(MainActivity.mLocation.getLongitude(), MainActivity.mLocation.getLatitude(), (float) MainActivity.mLocation.getAltitude());
             }
@@ -107,6 +107,7 @@ public class FlightMapper implements Runnable{
                 // x,y pixel coordinates with the center of the screen being the origin.
                 int count = 0;
                 int closestPlane = -1;
+                Aircraft closestAircraft = null;
                 float minDist = 100000000;
                 for (Aircraft aircraft : visibleAircraft) {
                     double aircraftAzimuth = aircraft.getAzimuth();
@@ -137,10 +138,11 @@ public class FlightMapper implements Runnable{
                     float screenY = Math.round(rotY + maxX / 2);
 
                     Log.v("Point mapped", "Rel Az:" + (aircraft.getAzimuth() - azimuth) + " X pos:" + rotX + " Rel Pitch:" + (aircraft.getPitch() - pitchInv) + " Y pos:" + rotY);
-                    float relDist = (float) Math.sqrt(Math.pow(aircraft.getAzimuth() - azimuth,2) + Math.pow(aircraft.getPitch() - pitch,2));
+                    float relDist = (float) Math.sqrt(Math.pow(aircraft.getAzimuth() - azimuth,2) + Math.pow(aircraft.getPitch() - pitchInv,2));
                     if (relDist < minDist) {
                         minDist = relDist;
                         closestPlane = count;
+                        closestAircraft = aircraft;
                     }
                     // Map point to screen
                     drawPlaneToScreenLocation(screenX, screenY, adjRoll, count, aircraft.getmIcao24());
@@ -153,6 +155,7 @@ public class FlightMapper implements Runnable{
                 clearUnusedPlanes(count);
                 final int asdfa = closestPlane;
                 final  int adfasdfa = count;
+                final Aircraft adsfohapug4 = closestAircraft;
                 if (closestPlane != -1) {
                     // Redraw closest plane to middle on top for clicking purposes
                     MainActivity.mPlaneIcons[closestPlane].post(new Runnable() {
@@ -168,6 +171,14 @@ public class FlightMapper implements Runnable{
                             }
                             MainActivity.mPlaneIcons[asdfa].setImageResource(R.drawable.center_plane_icon);
                             MainActivity.mPlaneIcons[asdfa].setElevation(1);
+                            MainActivity.callsignIndicator.setText(adsfohapug4.getCallsign());
+                        }
+                    });
+                } else {
+                    MainActivity.mPlaneIcons[0].post(new Runnable() {
+                        @Override
+                        public void run() {
+                            MainActivity.callsignIndicator.setText("            ");
                         }
                     });
                 }
