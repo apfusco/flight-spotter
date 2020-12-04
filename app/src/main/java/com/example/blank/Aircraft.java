@@ -1,5 +1,6 @@
 package com.example.blank;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import java.util.Calendar;
@@ -29,6 +30,9 @@ public class Aircraft {
     // OpenSky airport query
     private String mEstDepartureAirport;
     private String mEstArrivalAirport;
+
+    // Image file name
+    private Bitmap mImageBitmap;
 
     // Updated location
     private float mUpdatedLat;
@@ -101,6 +105,10 @@ public class Aircraft {
     public String getEstDepartureAirport() { return this.mEstDepartureAirport; }
 
     public String getEstArrivalAirport() { return this.mEstArrivalAirport; }
+
+    public Bitmap getImageBitmap() { return this.mImageBitmap; }
+
+    public void setImageBitmap(Bitmap imageFileName) { this.mImageBitmap = imageFileName; }
 
     public void setEstDepartureAirport(String estDepartureAirport) {
         System.out.println(estDepartureAirport); // TODO
