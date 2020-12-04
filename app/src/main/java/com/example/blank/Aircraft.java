@@ -78,6 +78,8 @@ public class Aircraft {
 
     }
 
+    public int getmIcao24() {return mIcao24;}
+
     public int getAzimuthIndex() { return this.mAzimuthIndex; }
 
     public int getPitchIndex() { return this.mPitchIndex; }
@@ -194,7 +196,7 @@ public class Aircraft {
         this.mPitchIndex = (int)Math.round(Math.floor(pitch / Math.PI
                 * AircraftDataStructure.ARRAY_LENGTH)) % AircraftDataStructure.ARRAY_LENGTH
                 + AircraftDataStructure.ARRAY_LENGTH / 2;
-        Log.i("UpdateSphericalPosition","Added Aircraft with Az:" + azimuth +" Pitch:" + pitch);
+        //Log.i("UpdateSphericalPosition","Added Aircraft with Az:" + azimuth +" Pitch:" + pitch);
         // if (this.mPitchIndex < 0)
         //     this.mPitchIndex += AircraftDataStructure.ARRAY_LENGTH;
         return new double[] {sphereR, azimuth, pitch};
@@ -202,4 +204,11 @@ public class Aircraft {
     }
 
 
+    public float getAltitude() {
+        return mBaroAltitude;
+    }
+
+    public float getVelocity() {
+        return mVelocity;
+    }
 }

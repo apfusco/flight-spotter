@@ -65,6 +65,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends AppCompatActivity implements SensorEventListener, OnMapReadyCallback {
@@ -109,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     };
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
+    private FlightMapper mapper;
     private View decorView;
     private boolean decorFlag = false;
 
@@ -117,21 +119,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     // UI components
     private View view;
-    private TextView x, y, z,lat,longi,alt,bThread,phiWin,thetaWin,testVisible;
     private float [] mRotationMatrix;
+    private TextView depCity, depAirport, arrCity, arrAirport, callsign, aircraftType, altitude, velocity, heading, longitude, latitude;
     private ImageView planeThing;
     private FloatingActionButton fab_main, fab1_mail, fab2_share;
     private Animation fab_open, fab_close, fab_clock, fab_anticlock;
-    Boolean isOpen = false;
-
+    private Boolean isOpen = false;
+    private FrameLayout dataFrame;
+    private ImageView exitButton;
+    private boolean exited = true;
+    private Aircraft currAircraft;
     SupportMapFragment mapFragment;
     Boolean MapUp = false;
+    private long lastChecked;
 
     // Globals
     public static ImageView [] mPlaneIcons = new ImageView[20];
     public static float[] mOrientation;
     public static Location mLocation;
     public static Context mContext;
+
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -234,6 +242,29 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     }
                 });
 
+        // Flight data fields
+        depCity = findViewById(R.id.depCity);
+        depAirport = findViewById(R.id.depAirport);
+        arrCity = findViewById(R.id.arrCity);
+        arrAirport = findViewById(R.id.arrAirport);
+        callsign = findViewById(R.id.callsign);
+        aircraftType = findViewById(R.id.aircraftType);
+        altitude = findViewById(R.id.altitude);
+        velocity = findViewById(R.id.velocity);
+        heading = findViewById(R.id.heading);
+        longitude = findViewById(R.id.longitude);
+        latitude = findViewById(R.id.latitude);
+        // Hide flight data for now
+        dataFrame = findViewById(R.id.dataFrame);
+        exitButton = findViewById(R.id.dataExit);
+        dataFrame.setVisibility(View.INVISIBLE);
+        exitButton.setVisibility(View.INVISIBLE);
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // set stop to false and spawn new counter thread and
+                exitDialog(v);
+            }
+        });
         // system services
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         sensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
@@ -250,29 +281,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mContext = getApplicationContext();
         // Set up imageviews to use for planes
         FrameLayout main = (FrameLayout)findViewById(R.id.frameLayout);
-        for (int i =0; i<20;i++){
+        for (int i =0; i<20;i++) {
             mPlaneIcons[i] = new ImageView(mContext);
-            mPlaneIcons[i].setImageResource(R.drawable.plane);
+            mPlaneIcons[i].setImageResource(R.drawable.plane_icon);
             mPlaneIcons[i].setVisibility(View.INVISIBLE);
             mPlaneIcons[i].setAdjustViewBounds(true);
             mPlaneIcons[i].setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
             mPlaneIcons[i].setScaleType(ImageView.ScaleType.MATRIX);
+            mPlaneIcons[i].setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    // set stop to false and spawn new counter thread and
+                    startDialog(v);
+                }
+            });
             main.addView(mPlaneIcons[i]);
         }
 
-        // get textviews
-        x = findViewById(R.id.xVal);
-        y = findViewById(R.id.yVal);
-        z = findViewById(R.id.zVal);
-        lat = findViewById(R.id.latVal);
-        longi = findViewById(R.id.longVal);
-        alt = findViewById(R.id.altVal);
-        bThread = findViewById(R.id.bThread);
-        phiWin = findViewById(R.id.phiWindow);
-        thetaWin = findViewById(R.id.thetaWindow);
-        testVisible = findViewById(R.id.testAircraftVisible);
 
         // register sensor manager
         sensorManager.registerListener(this,
@@ -283,7 +309,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
-                updateLocationInfo(location);
             }
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {}
@@ -304,18 +329,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,0,locationListener);
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if(location!=null) {
-            updateLocationInfo(location);
             mLocation = location;
         }
 
-        // start calculation thread in background
-        calcThread runner = new calcThread();
-        new Thread(runner).start();
-
         // Start flight mapping thread in the background once we get location
         while (mLocation == null) {}
-        FlightMapper mapper = new FlightMapper();
+        mapper = new FlightMapper();
         new Thread(mapper).start();
+
+        // start flight data update thread in background
+        calcThread runner = new calcThread();
+        new Thread(runner).start();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -417,12 +441,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    public void updateLocationInfo(Location location) {
-        lat.setText("lat:        " + location.getLatitude());
-        longi.setText("longi:   " + location.getLongitude());
-        alt.setText("alt:       " + location.getAltitude());
-    }
-
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
@@ -474,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onPause();
         stopBackgroundThread();
         sensorManager.unregisterListener(this);
-        
+        // TODO pause the flightmapper
         // FIXME will need to update the onPause and onResume functions because Opening a new dialog
     }
 
@@ -496,9 +514,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void startDialog(View v) {
-        // Your code here.
-        Intent intent = new Intent(MainActivity.this, DialogActivity.class);
-        startActivity(intent);
+        // Populate scroll view
+        int icao24 = v.getId();
+        ArrayList<Aircraft> aircrafts = mapper.getAirTracker().getAllAircraft();
+        currAircraft = aircrafts.get(0);
+        for (Aircraft aircraft1:aircrafts) {
+            if (aircraft1.getmIcao24() == icao24) {
+                currAircraft = aircraft1;
+                break;
+            }
+        }
+        // Update static fields
+        //depCity.setText();
+        //depAirport.setText();
+        //arrCity.setText();
+        //arrAirport.setText();
+        //aircraftType.setText();
+        // Allow thread to update dynamic fields
+        exited  = false;
+        // Reveal scroll view and exit button
+        dataFrame.setVisibility(View.VISIBLE);
+        exitButton.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -514,40 +550,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43, -89), 7));
     }
 
-    // background thread that is always running and keeping track of time
-    class calcThread implements Runnable {
-        private long currentCount;
-        private Matrix myMat = new Matrix();
 
-        // constructor method
-        public calcThread() {
-            currentCount = 0;
-        }
-
-        // main method for runnable
-        @Override
-        public void run() {
-            // when spawned always run in background
-            while (true) {
-                // keep thread at a low load
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                currentCount += 1;
-                myMat.setTranslate(150, 1000);
-                myMat.postRotate(currentCount*7, 675, 1000);
-
-                // post to the main handler
-                mainHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        bThread.setText("count: " + currentCount);
-                    }
-                });
-            }
-        }
+    private void exitDialog(View v) {
+        exited = true;
+        dataFrame.setVisibility(View.INVISIBLE);
+        exitButton.setVisibility(View.INVISIBLE);
     }
 
     private float azimuthToPhi(float az) {
@@ -560,5 +567,35 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private float adjustRoll(float roll) {
         return (float) ( ((roll + Math.PI/2) % (Math.PI*2) + (2*Math.PI)) % (2*Math.PI));
+    }
+
+    // background thread that is always running and keeping track of time
+    class calcThread implements Runnable {
+        // main method for runnable
+        @Override
+        public void run() {
+            // when spawned always run in background
+            while (true) {
+                if (!exited) {
+                    // Query every 1/2 sec
+                    long currTime = Calendar.getInstance().getTimeInMillis();
+                    if (currTime > lastChecked + 500) {
+                        lastChecked = currTime;
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callsign.setText("Callsign: " + currAircraft.getCallsign());
+                                altitude.setText("Altitude: " + String.valueOf(currAircraft.getAltitude()) + "m");
+                                velocity.setText("Velocity: " + String.valueOf(currAircraft.getVelocity()) + "m/s");
+                                heading.setText("Heading: " + String.valueOf(currAircraft.getHeading()) + "°");
+                                latitude.setText("Latitude: " + String.valueOf(currAircraft.getLocation()[0]) + "°");
+                                longitude.setText("Longitude: " + String.valueOf(currAircraft.getLocation()[1]) + "°");
+                            }
+                        });
+                    }
+
+                }
+            }
+        }
     }
 }

@@ -16,85 +16,8 @@
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
     </FrameLayout>
-
-    <LinearLayout
-        android:id="@+id/textOut"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/xVal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/azimuth"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-        <TextView
-            android:id="@+id/yVal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/pitch"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-        <TextView
-            android:id="@+id/zVal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/roll"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-        <TextView
-            android:id="@+id/phiWindow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="phiWindow:"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-        <TextView
-            android:id="@+id/thetaWindow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="thetaWindow:"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-        <TextView
-            android:id="@+id/testAircraftVisible"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="testAircraftVisible: "
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-        <TextView
-            android:id="@+id/latVal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/lat"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-        <TextView
-            android:id="@+id/longVal"
-            android:layout_width="match_parent"
-            android:layout_height="75dp"
-            android:text="@string/longi"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-        <TextView
-            android:id="@+id/altVal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/alt"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-        <TextView
-            android:id="@+id/bThread"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/counter"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -110,5 +33,177 @@
     </FrameLayout>
 
     <include layout="@layout/content_main" />
+
+    <FrameLayout
+        android:id="@+id/dataFrame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            style="@android:style/Widget.DeviceDefault.Light.ScrollView"
+            android:layout_width="300dp"
+            android:layout_height="574dp"
+
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/frame">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#FFFFFF"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:src="@drawable/no_image_icon_6" />
+
+                <TextView
+                    android:id="@+id/flightInfoTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Flight Information:"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="125dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/departing"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Departing" />
+
+                        <TextView
+                            android:id="@+id/depCity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="City" />
+
+                        <TextView
+                            android:id="@+id/depAirport"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Airport" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/arriving"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Arriving" />
+
+                        <TextView
+                            android:id="@+id/arrCity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="City" />
+
+                        <TextView
+                            android:id="@+id/arrAirport"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Airport" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/aircraftInformation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Aircraft Information:"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+
+                <TextView
+                    android:id="@+id/callsign"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Callsign" />
+
+                <TextView
+                    android:id="@+id/aircraftType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Aircraft Type" />
+
+                <TextView
+                    android:id="@+id/aircraftStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Aircraft Status:"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+
+                <TextView
+                    android:id="@+id/altitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Altitude" />
+
+                <TextView
+                    android:id="@+id/velocity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Velocity" />
+
+                <TextView
+                    android:id="@+id/heading"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Heading" />
+
+                <TextView
+                    android:id="@+id/latitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Latitude" />
+
+                <TextView
+                    android:id="@+id/longitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Longitude" />
+
+            </LinearLayout>
+        </ScrollView>
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/dataExit"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="325dp"
+        android:layout_marginLeft="340dp"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/circle_button" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TAP screen to see more information about a flight. " />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="CENTER a plane in the screen to highlight it." />
+
 
 </RelativeLayout>
