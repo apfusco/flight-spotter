@@ -1,5 +1,7 @@
 package com.example.blank;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
@@ -11,17 +13,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
 public class AirTracker {
 
-    private static final String URL_STRING = "https://opensky-network.org/api";
+    private static final String OPENSKY_URL = "https://opensky-network.org/api";
+    private static final String PIC_URL = "https://www.airport-data.com/api/ac_thumb.json";
     public static final int CONNECTION_TIMEOUT = 5000;
     public static final int READ_TIMEOUT = 5000;
     public static final int VISUAL_DISTANCE = 50000; // In meters
@@ -172,7 +181,7 @@ public class AirTracker {
             String params = builder.build().getEncodedQuery();
             Log.i("QUERY", params);
 
-            JSONTokener jsonTokener = this.makeRequest((URL_STRING + "/flights/aircraft"), "GET",
+            JSONTokener jsonTokener = this.makeRequest((OPENSKY_URL + "/flights/aircraft"), "GET",
                     params);
             JSONArray responseJSON = new JSONArray(jsonTokener);
 
@@ -199,6 +208,29 @@ public class AirTracker {
 
         } catch (Exception e) {
             // This might happen every once in a while
+            e.printStackTrace();
+        }
+        this.getImage(aircraft);
+    }
+
+    private void getImage(Aircraft aircraft) {
+        // Set parameters
+        Uri.Builder builder = new Uri.Builder()
+                .appendQueryParameter("m", Integer.toString(aircraft.getIcao24(), 16))
+                .appendQueryParameter("n", Integer.toString(1));
+        String params = builder.build().getEncodedQuery();
+        Log.i("QUERY", params);
+
+        JSONTokener jsonTokener = this.makeRequest(PIC_URL, "GET", params);
+        JSONObject jsonResponse;
+        try {
+            jsonResponse = new JSONObject(jsonTokener);
+            URL imageURL = new URL(jsonResponse.getJSONArray("data").getJSONObject(0)
+                    .getString("image"));
+            InputStream inputStream = imageURL.openStream();
+            Bitmap imageBitmap = BitmapFactory.decodeStream(new BufferedInputStream(inputStream));
+            aircraft.setImageBitmap(imageBitmap);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -241,7 +273,7 @@ public class AirTracker {
             String params = builder.build().getEncodedQuery();
             Log.i("QUERY", params);
 
-            JSONTokener jsonTokener = this.makeRequest((URL_STRING + "/states/all"), "GET",
+            JSONTokener jsonTokener = this.makeRequest((OPENSKY_URL + "/states/all"), "GET",
                     params);
             return new JSONObject(jsonTokener);
         } catch (Exception e) {
