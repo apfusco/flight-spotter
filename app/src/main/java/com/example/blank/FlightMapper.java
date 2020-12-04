@@ -42,9 +42,9 @@ public class FlightMapper implements Runnable{
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void run () {
         while (true) {
-            // Query every 10 sec so your IP doesn't get banned by the API
+            // Query every 20 sec so your IP doesn't get banned by the API
             long currTime = Calendar.getInstance().getTimeInMillis();
-            if (currTime > lastChecked + ONE_SEC*10) {
+            if (currTime > lastChecked + ONE_SEC*20) {
                 lastChecked = currTime;
                 airTracker.reloadLocations(MainActivity.mLocation.getLongitude(), MainActivity.mLocation.getLatitude(), (float) MainActivity.mLocation.getAltitude());
             }
