@@ -78,8 +78,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Flight Information:"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+                    android:text="Flight Information"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textSize="24sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -95,19 +96,22 @@
                             android:id="@+id/departing"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Departing" />
+                            android:text="Departing"
+                            android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/depCity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="City" />
+                            android:text="City"
+                            android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/depAirport"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Airport" />
+                            android:text="Airport"
+                            android:textSize="18sp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -119,19 +123,22 @@
                             android:id="@+id/arriving"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Arriving" />
+                            android:text="Arriving"
+                            android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/arrCity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="City" />
+                            android:text="City"
+                            android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/arrAirport"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Airport" />
+                            android:text="Airport"
+                            android:textSize="18sp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -139,57 +146,66 @@
                     android:id="@+id/aircraftInformation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Aircraft Information:"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+                    android:text="Aircraft Information"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/callsign"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Callsign" />
+                    android:text="Callsign"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/aircraftType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Aircraft Type" />
+                    android:text="Aircraft Type"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/aircraftStatus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Aircraft Status:"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+                    android:text="Aircraft Status"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/altitude"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Altitude" />
+                    android:text="Altitude"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/velocity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Velocity" />
+                    android:text="Velocity"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/heading"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Heading" />
+                    android:text="Heading"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/latitude"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Latitude" />
+                    android:text="Latitude"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/longitude"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Longitude" />
+                    android:text="Longitude"
+                    android:textSize="18sp" />
 
             </LinearLayout>
         </ScrollView>
