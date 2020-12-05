@@ -29,6 +29,7 @@ public class FlightMapper implements Runnable{
     private final double HORIZONTAL_FOV = 40.77;
     private final double TWO_MINS = 120000;
     private final double ONE_SEC = 1000;
+    public static Aircraft update = null;
     private long lastChecked = 0;
     private long lastUpdate = 0;
     private boolean once = false;
@@ -42,9 +43,14 @@ public class FlightMapper implements Runnable{
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void run () {
         while (true) {
-            // Query every 10 sec so your IP doesn't get banned by the API
+            if (update != null) {
+                airTracker.updateMoreInfo(update);
+                MainActivity.updating = false;
+                update = null;
+            }
+            // Query every 20 sec so your IP doesn't get banned by the API
             long currTime = Calendar.getInstance().getTimeInMillis();
-            if (currTime > lastChecked + ONE_SEC*10) {
+            if (currTime > lastChecked + ONE_SEC*20) {
                 lastChecked = currTime;
                 airTracker.reloadLocations(MainActivity.mLocation.getLongitude(), MainActivity.mLocation.getLatitude(), (float) MainActivity.mLocation.getAltitude());
             }
@@ -145,7 +151,7 @@ public class FlightMapper implements Runnable{
                         closestAircraft = aircraft;
                     }
                     // Map point to screen
-                    drawPlaneToScreenLocation(screenX, screenY, adjRoll, count, aircraft.getmIcao24());
+                    drawPlaneToScreenLocation(screenX, screenY, adjRoll, count, aircraft.getmIcao24(), aircraft.getScreenDirection());
                     count++;
                     if (count == 20) {
                         break;
@@ -153,6 +159,7 @@ public class FlightMapper implements Runnable{
                 }
                 Log.v("Mapper", " Count:" + count);
                 clearUnusedPlanes(count);
+                // Use descriptive variable names because Java is the best
                 final int asdfa = closestPlane;
                 final  int adfasdfa = count;
                 final Aircraft adsfohapug4 = closestAircraft;
@@ -203,10 +210,10 @@ public class FlightMapper implements Runnable{
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void drawPlaneToScreenLocation(float screenX, float screenY, float adjRollRadians, final int count, final int icao24){
+    private void drawPlaneToScreenLocation(float screenX, float screenY, float adjRollRadians, final int count, final int icao24, double screenDirection){
         final Matrix myMat = new Matrix();
         myMat.setTranslate(screenY, screenX);
-        myMat.postRotate((float) Math.toDegrees(-adjRollRadians), screenY, screenX);
+        myMat.postRotate((float) Math.toDegrees(-adjRollRadians - screenDirection), screenY, screenX);
         // Tell UI thread to draw ImageView to Screen
         MainActivity.mPlaneIcons[count].post(new Runnable() {
              @Override
