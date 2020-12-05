@@ -245,7 +245,7 @@ public class AirTracker {
         String params = builder.build().getEncodedQuery();
         Log.i("QUERY", params);
 
-        JSONTokener jsonTokener = this.makeRequest(PIC_URL, "GET", params);
+        JSONTokener jsonTokener = this.makeRequest(AIRPORT_URL, "GET", params);
         JSONObject jsonResponse;
         try {
             jsonResponse = new JSONObject(jsonTokener);
