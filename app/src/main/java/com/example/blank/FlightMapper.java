@@ -29,6 +29,7 @@ public class FlightMapper implements Runnable{
     private final double HORIZONTAL_FOV = 40.77;
     private final double TWO_MINS = 120000;
     private final double ONE_SEC = 1000;
+    public static Aircraft update = null;
     private long lastChecked = 0;
     private long lastUpdate = 0;
     private boolean once = false;
@@ -42,6 +43,11 @@ public class FlightMapper implements Runnable{
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void run () {
         while (true) {
+            if (update != null) {
+                airTracker.updateMoreInfo(update);
+                MainActivity.updating = false;
+                update = null;
+            }
             // Query every 20 sec so your IP doesn't get banned by the API
             long currTime = Calendar.getInstance().getTimeInMillis();
             if (currTime > lastChecked + ONE_SEC*20) {

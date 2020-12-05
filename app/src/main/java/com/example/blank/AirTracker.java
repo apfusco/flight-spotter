@@ -249,7 +249,8 @@ public class AirTracker {
         JSONObject jsonResponse;
         try {
             jsonResponse = new JSONObject(jsonTokener);
-            aircraft.setEstDepartureAirport(jsonResponse.getString("name"));
+            aircraft.setEstDepartureAirportName(jsonResponse.getString("name"));
+
         } catch (Exception e) {
             e.printStackTrace();
         }

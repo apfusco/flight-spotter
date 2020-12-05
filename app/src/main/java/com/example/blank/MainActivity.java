@@ -69,6 +69,7 @@ import java.util.Calendar;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends AppCompatActivity implements SensorEventListener, OnMapReadyCallback {
+    public static boolean updating;
     // Google Pixel XL in 16:9 crop mode
     private final double VERTICAL_FOV = 66.9;
     private final double DIAGONAL_FOV = 74.32;
@@ -528,7 +529,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
         // Update static fields
-        mapper.getAirTracker().updateMoreInfo(currAircraft);
+        mapper.update = currAircraft;
+        updating = true;
+        while (updating) { }
         image.setImageBitmap(currAircraft.getImageBitmap());
         depCity.setText(currAircraft.getEstDepartureAirportName());
         depAirport.setText(currAircraft.getEstDepartureAirport());
