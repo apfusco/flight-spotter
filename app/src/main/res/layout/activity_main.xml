@@ -50,7 +50,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="90dp"
             android:alpha=".75"
-            android:background="#5A5A5A"
+            android:background="@drawable/callsign_frame"
             android:gravity="center_horizontal|center_vertical"
             android:text="           "
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -87,7 +87,7 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:id="@+id/imageView"
+                    android:id="@+id/image"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:src="@drawable/no_image_icon_6" />

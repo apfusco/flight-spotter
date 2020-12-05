@@ -162,8 +162,8 @@ public class Aircraft {
                 * Math.sin(this.mTrueTrack / 360 * 2 * Math.PI);
         double dY = this.mVelocity * (curTime - this.mTimePosition)
                 * Math.cos(this.mTrueTrack / 360 * 2 * Math.PI);
-        System.out.println("dX: " + Double.toString(dX)); // FIXME
-        System.out.println("dY: " + Double.toString(dY)); // FIXME
+        //System.out.println("dX: " + Double.toString(dX)); // FIXME
+        //System.out.println("dY: " + Double.toString(dY)); // FIXME
         this.mUpdatedLat = (float) (dY / earthR * 360 / 2 / Math.PI + this.mLatitude);
         this.mUpdatedLon = (float) (dX / earthR /
                 Math.cos((this.mLatitude + this.mUpdatedLat) / 360 * Math.PI) * 360 / 2 / Math.PI

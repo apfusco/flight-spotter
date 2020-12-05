@@ -145,7 +145,7 @@ public class FlightMapper implements Runnable{
                         closestAircraft = aircraft;
                     }
                     // Map point to screen
-                    drawPlaneToScreenLocation(screenX, screenY, adjRoll, count, aircraft.getmIcao24());
+                    drawPlaneToScreenLocation(screenX, screenY, adjRoll, count, aircraft.getmIcao24(), aircraft.getScreenDirection());
                     count++;
                     if (count == 20) {
                         break;
@@ -203,7 +203,7 @@ public class FlightMapper implements Runnable{
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void drawPlaneToScreenLocation(float screenX, float screenY, float adjRollRadians, final int count, final int icao24){
+    private void drawPlaneToScreenLocation(float screenX, float screenY, float adjRollRadians, final int count, final int icao24, double screenDirection){
         final Matrix myMat = new Matrix();
         myMat.setTranslate(screenY, screenX);
         myMat.postRotate((float) Math.toDegrees(-adjRollRadians), screenY, screenX);
