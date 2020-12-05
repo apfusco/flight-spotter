@@ -188,6 +188,7 @@ public class AirTracker {
             AircraftInfo info = new AircraftInfo(aircraft.getIcao24(), aircraft.getCallsign(),
                     aircraft.getOriginCountry());
 
+            /* // TODO: Get current arrival airport another way
             if ((responseJSON.length() > 0)
                     && (!responseJSON.getJSONObject(0).isNull("estDepartureAirport"))) {
                 String estDepAirport = responseJSON.getJSONObject(0)
@@ -195,13 +196,14 @@ public class AirTracker {
                 info.setEstDepartureAirport(estDepAirport);
                 aircraft.setEstDepartureAirport(estDepAirport);
             }
+            */
 
             if ((responseJSON.length() > 0)
                     && (!responseJSON.getJSONObject(0).isNull("estArrivalAirport"))) {
                 String estArivAirport = responseJSON.getJSONObject(0)
                         .getString("estArrivalAirport");
-                info.setEstArrivalAirport(estArivAirport);
-                aircraft.setEstArrivalAirport(estArivAirport);
+                info.setEstDepartureAirport(estArivAirport);
+                aircraft.setEstDepartureAirport(estArivAirport);
             }
 
             this.cache.put(aircraft.getIcao24(), info);
