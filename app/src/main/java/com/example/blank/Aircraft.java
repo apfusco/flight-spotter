@@ -46,6 +46,7 @@ public class Aircraft {
     private double mPitch;
     private int mAzimuthIndex;
     private int mPitchIndex;
+    private double mScreenDirection;
 
     public Aircraft(int timeQuery,
                     int icao24,
@@ -95,6 +96,8 @@ public class Aircraft {
     public double getAzimuth() { return this.mAzimuth; };
 
     public double getPitch() { return this.mPitch; };
+
+    public double getScreenDirection() { return this.mScreenDirection; }
 
     public int getIcao24() { return this.mIcao24; }
 
@@ -229,6 +232,19 @@ public class Aircraft {
         } else
             pitch = Math.atan(cartPosVector[2] / cylinderR);
 
+        // Get angle of travel on screen
+        double dAzimuth = azimuth - this.mAzimuth;
+        double dPitch = pitch - this.mAzimuth;
+        if (dAzimuth > 0)
+            this.mScreenDirection = Math.PI + Math.atan(dPitch / dAzimuth);
+        else if (dAzimuth < 0)
+            this.mScreenDirection = Math.PI - Math.atan(dPitch / dAzimuth) % (2 * Math.PI);
+        else if (dPitch > 0)
+            this.mScreenDirection = 3 * Math.PI / 2;
+        else if (dPitch < 0)
+            this.mScreenDirection = Math.PI / 2;
+        else
+            this.mScreenDirection = 0;
         this.mSphereR = sphereR;
         this.mAzimuth = azimuth;
         this.mPitch = pitch;
