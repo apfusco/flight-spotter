@@ -30,6 +30,7 @@ import java.util.HashMap;
 public class AirTracker {
 
     private static final String OPENSKY_URL = "https://opensky-network.org/api";
+    private static final String AIRPORT_URL = "https://www.airport-data.com/api/ap_info.json";
     private static final String PIC_URL = "https://www.airport-data.com/api/ac_thumb.json";
     public static final int CONNECTION_TIMEOUT = 5000;
     public static final int READ_TIMEOUT = 5000;
@@ -204,6 +205,7 @@ public class AirTracker {
                         .getString("estArrivalAirport");
                 info.setEstDepartureAirport(estArivAirport);
                 aircraft.setEstDepartureAirport(estArivAirport);
+                getAirportInfo(aircraft);
             }
 
             this.cache.put(aircraft.getIcao24(), info);
@@ -232,6 +234,23 @@ public class AirTracker {
             InputStream inputStream = imageURL.openStream();
             Bitmap imageBitmap = BitmapFactory.decodeStream(new BufferedInputStream(inputStream));
             aircraft.setImageBitmap(imageBitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getAirportInfo(Aircraft aircraft) {
+        // Set parameters
+        Uri.Builder builder = new Uri.Builder()
+                .appendQueryParameter("icao", aircraft.getEstDepartureAirport());
+        String params = builder.build().getEncodedQuery();
+        Log.i("QUERY", params);
+
+        JSONTokener jsonTokener = this.makeRequest(PIC_URL, "GET", params);
+        JSONObject jsonResponse;
+        try {
+            jsonResponse = new JSONObject(jsonTokener);
+            aircraft.setEstDepartureAirport(jsonResponse.getString("name"));
         } catch (Exception e) {
             e.printStackTrace();
         }
