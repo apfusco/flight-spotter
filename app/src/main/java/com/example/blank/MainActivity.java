@@ -69,6 +69,7 @@ import java.util.Calendar;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MainActivity extends AppCompatActivity implements SensorEventListener, OnMapReadyCallback {
+    public static boolean updating;
     // Google Pixel XL in 16:9 crop mode
     private final double VERTICAL_FOV = 66.9;
     private final double DIAGONAL_FOV = 74.32;
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private View view;
     private float [] mRotationMatrix;
     private TextView depCity, depAirport, arrCity, arrAirport, callsign, aircraftType, altitude, velocity, heading, longitude, latitude;
-    private ImageView planeThing;
+    private ImageView image;
     private FloatingActionButton fab_main, fab1_mail, fab2_share;
     private Animation fab_open, fab_close, fab_clock, fab_anticlock;
     private Boolean isOpen = false;
@@ -245,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 });
 
         // Flight data fields
+        image = findViewById(R.id.image);
         depCity = findViewById(R.id.depCity);
         depAirport = findViewById(R.id.depAirport);
         arrCity = findViewById(R.id.arrCity);
@@ -527,16 +529,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
         // Update static fields
-        //depCity.setText();
-        //depAirport.setText();
-        //arrCity.setText();
-        //arrAirport.setText();
-        //aircraftType.setText();
+        mapper.update = currAircraft;
+        callsign.setText("Callsign: " + currAircraft.getCallsign());
+        // TODO aircraftType.setText();
         // Allow thread to update dynamic fields
         exited  = false;
         // Reveal scroll view and exit button
         dataFrame.setVisibility(View.VISIBLE);
         exitButton.setVisibility(View.VISIBLE);
+    }
+
+    private void exitDialog(View v) {
+        exited = true;
+        dataFrame.setVisibility(View.INVISIBLE);
+        exitButton.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -553,24 +559,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-    private void exitDialog(View v) {
-        exited = true;
-        dataFrame.setVisibility(View.INVISIBLE);
-        exitButton.setVisibility(View.INVISIBLE);
-    }
-
-    private float azimuthToPhi(float az) {
-        return (float) ( ((Math.PI/2 - az) % (2*Math.PI) + (2*Math.PI)) % (2*Math.PI) );
-    }
-
-    private float pitchToTheta(float pitch) {
-        return (float) (pitch + Math.PI/2);
-    }
-
-    private float adjustRoll(float roll) {
-        return (float) ( ((roll + Math.PI/2) % (Math.PI*2) + (2*Math.PI)) % (2*Math.PI));
-    }
-
     // background thread that is always running and keeping track of time
     class calcThread implements Runnable {
         // main method for runnable
@@ -586,7 +574,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         mainHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                callsign.setText("Callsign: " + currAircraft.getCallsign());
+                                image.setImageBitmap(currAircraft.getImageBitmap());
+                                depCity.setText(currAircraft.getEstDepartureAirportName());
+                                depAirport.setText(currAircraft.getEstDepartureAirport());
+                                arrCity.setText(currAircraft.getEstArrivalAirportName());
+                                arrAirport.setText(currAircraft.getEstArrivalAirport());
                                 altitude.setText("Altitude: " + String.valueOf(currAircraft.getAltitude()) + "m");
                                 velocity.setText("Velocity: " + String.valueOf(currAircraft.getVelocity()) + "m/s");
                                 heading.setText("Heading: " + String.valueOf(currAircraft.getHeading()) + "°");
