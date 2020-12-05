@@ -213,7 +213,7 @@ public class FlightMapper implements Runnable{
     private void drawPlaneToScreenLocation(float screenX, float screenY, float adjRollRadians, final int count, final int icao24, double screenDirection){
         final Matrix myMat = new Matrix();
         myMat.setTranslate(screenY, screenX);
-        myMat.postRotate((float) Math.toDegrees(-adjRollRadians), screenY, screenX);
+        myMat.postRotate((float) Math.toDegrees(-adjRollRadians - screenDirection), screenY, screenX);
         // Tell UI thread to draw ImageView to Screen
         MainActivity.mPlaneIcons[count].post(new Runnable() {
              @Override
