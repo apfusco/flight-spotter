@@ -1,12 +1,13 @@
 package com.example.blank;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import java.util.Calendar;
 
 public class Aircraft {
 
-    // From OpenSky SPI
+    // From OpenSky API
     private int mTimeQuery;        // Time that the query was made (applies to position)
     private int mIcao24;           // 24-bit address of transponder
     private String mCallsign;      // Should be 8 characters (can be null)
@@ -26,6 +27,15 @@ public class Aircraft {
     private boolean mSpi;          // Special purpose indicator
     private int mPositionSource;   // {0=ADS-B, 1=ASTERIX, 2=MLAT}
 
+    // OpenSky airport query
+    private String mEstDepartureAirport;
+    private String mEstDepartureAirportName;
+    private String mEstArrivalAirport;
+    private String mEstArrivalAirportName;
+
+    // Image file name
+    private Bitmap mImageBitmap;
+
     // Updated location
     private float mUpdatedLat;
     private float mUpdatedLon;
@@ -36,6 +46,7 @@ public class Aircraft {
     private double mPitch;
     private int mAzimuthIndex;
     private int mPitchIndex;
+    private double mScreenDirection;
 
     public Aircraft(int timeQuery,
                     int icao24,
@@ -88,9 +99,47 @@ public class Aircraft {
 
     public double getPitch() { return this.mPitch; };
 
+    public double getScreenDirection() { return this.mScreenDirection; }
+
+    public int getIcao24() { return this.mIcao24; }
+
+    public String getOriginCountry() { return this.mOriginCountry; }
+
     public String getCallsign() { return this.mCallsign; }
 
     public float getTrueTrack() { return this.mTrueTrack; }
+
+    public String getEstDepartureAirport() { return this.mEstDepartureAirport; }
+
+    public String getEstDepartureAirportName() { return this.mEstDepartureAirportName; }
+
+    public String getEstArrivalAirport() { return this.mEstArrivalAirport; }
+
+    public String getEstArrivalAirportName() { return this.mEstArrivalAirportName; }
+
+    public Bitmap getImageBitmap() { return this.mImageBitmap; }
+
+    public void setImageBitmap(Bitmap imageFileName) { this.mImageBitmap = imageFileName; }
+
+    public void setEstDepartureAirport(String estDepartureAirport) {
+        System.out.println(estDepartureAirport); // TODO
+        this.mEstDepartureAirport = estDepartureAirport;
+    }
+
+    public void setEstDepartureAirportName(String estDepartureAirportName) {
+        System.out.println(estDepartureAirportName); // TODO
+        this.mEstDepartureAirportName = estDepartureAirportName;
+    }
+
+    public void setEstArrivalAirport(String estArrivalAirport) {
+        System.out.println(estArrivalAirport); // TODO
+        this.mEstArrivalAirport = estArrivalAirport;
+    }
+
+    public void setEstArrivalAirportName(String estArrivalAirportName) {
+        System.out.println(estArrivalAirportName); // TODO
+        this.mEstArrivalAirportName = estArrivalAirportName;
+    }
 
     public float getHeading() {
         if (this.mTrueTrack > 180)
@@ -185,6 +234,19 @@ public class Aircraft {
         } else
             pitch = Math.atan(cartPosVector[2] / cylinderR);
 
+        // Get angle of travel on screen
+        double dAzimuth = azimuth - this.mAzimuth;
+        double dPitch = pitch - this.mAzimuth;
+        if (dAzimuth > 0)
+            this.mScreenDirection = Math.PI + Math.atan(dPitch / dAzimuth);
+        else if (dAzimuth < 0)
+            this.mScreenDirection = Math.PI - Math.atan(dPitch / dAzimuth) % (2 * Math.PI);
+        else if (dPitch > 0)
+            this.mScreenDirection = 3 * Math.PI / 2;
+        else if (dPitch < 0)
+            this.mScreenDirection = Math.PI / 2;
+        else
+            this.mScreenDirection = 0;
         this.mSphereR = sphereR;
         this.mAzimuth = azimuth;
         this.mPitch = pitch;
