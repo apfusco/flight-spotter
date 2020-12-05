@@ -184,8 +184,8 @@ public class Aircraft {
         else if (this.mBaroAltitude != 0)
             altitude = this.mBaroAltitude + this.mVerticalRate * (curTime - this.mTimePosition);
         else { // TODO: Possibly come up with way to estimate altitude when not given
-            Log.w("updateSphericalPosition", "Was not given altitude for "
-                    + Integer.toString(this.mIcao24));
+            // Log.w("updateSphericalPosition", "Was not given altitude for "
+            //         + Integer.toString(this.mIcao24));
             return null;
         }
         double earthR = AirTracker.getEarthRadius((float)posLat) + altitude;
