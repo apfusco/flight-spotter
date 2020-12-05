@@ -159,6 +159,7 @@ public class FlightMapper implements Runnable{
                 }
                 Log.v("Mapper", " Count:" + count);
                 clearUnusedPlanes(count);
+                // Use descriptive variable names because Java is the best
                 final int asdfa = closestPlane;
                 final  int adfasdfa = count;
                 final Aircraft adsfohapug4 = closestAircraft;

@@ -530,13 +530,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         // Update static fields
         mapper.update = currAircraft;
-        updating = true;
-        while (updating) { }
-        image.setImageBitmap(currAircraft.getImageBitmap());
-        depCity.setText(currAircraft.getEstDepartureAirportName());
-        depAirport.setText(currAircraft.getEstDepartureAirport());
-        arrCity.setText(currAircraft.getEstArrivalAirportName());
-        arrAirport.setText(currAircraft.getEstArrivalAirport());
         callsign.setText("Callsign: " + currAircraft.getCallsign());
         // TODO aircraftType.setText();
         // Allow thread to update dynamic fields
@@ -581,6 +574,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         mainHandler.post(new Runnable() {
                             @Override
                             public void run() {
+                                image.setImageBitmap(currAircraft.getImageBitmap());
+                                depCity.setText(currAircraft.getEstDepartureAirportName());
+                                depAirport.setText(currAircraft.getEstDepartureAirport());
+                                arrCity.setText(currAircraft.getEstArrivalAirportName());
+                                arrAirport.setText(currAircraft.getEstArrivalAirport());
                                 altitude.setText("Altitude: " + String.valueOf(currAircraft.getAltitude()) + "m");
                                 velocity.setText("Velocity: " + String.valueOf(currAircraft.getVelocity()) + "m/s");
                                 heading.setText("Heading: " + String.valueOf(currAircraft.getHeading()) + "°");
