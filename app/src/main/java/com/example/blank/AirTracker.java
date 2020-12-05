@@ -174,7 +174,7 @@ public class AirTracker {
             // Thread.sleep(10); // Don't overwhelm the API.
             int time = (new Long(Calendar.getInstance().getTime().getTime() / 1000))
                     .intValue();
-            int timeDiff = 60 * 60 * 24 * 3; // 3 days
+            int timeDiff = 60 * 60 * 24 * 20; // 3 days
             Uri.Builder builder = new Uri.Builder()
                     .appendQueryParameter("icao24", Integer.toString(aircraft.getIcao24(), 16))
                     .appendQueryParameter("begin", Integer.toString(time - timeDiff))
