@@ -29,7 +29,9 @@ public class Aircraft {
 
     // OpenSky airport query
     private String mEstDepartureAirport;
+    private String mEstDepartureAirportName;
     private String mEstArrivalAirport;
+    private String mEstArrivalAirportName;
 
     // Image file name
     private Bitmap mImageBitmap;
@@ -104,7 +106,11 @@ public class Aircraft {
 
     public String getEstDepartureAirport() { return this.mEstDepartureAirport; }
 
+    public String getEstDepartureAirportName() { return this.mEstDepartureAirportName; }
+
     public String getEstArrivalAirport() { return this.mEstArrivalAirport; }
+
+    public String getEstArrivalAirportName() { return this.mEstArrivalAirportName; }
 
     public Bitmap getImageBitmap() { return this.mImageBitmap; }
 
@@ -115,9 +121,19 @@ public class Aircraft {
         this.mEstDepartureAirport = estDepartureAirport;
     }
 
+    public void setEstDepartureAirportName(String estDepartureAirportName) {
+        System.out.println(estDepartureAirportName); // TODO
+        this.mEstDepartureAirportName = estDepartureAirportName;
+    }
+
     public void setEstArrivalAirport(String estArrivalAirport) {
         System.out.println(estArrivalAirport); // TODO
         this.mEstArrivalAirport = estArrivalAirport;
+    }
+
+    public void setEstArrivalAirportName(String estArrivalAirportName) {
+        System.out.println(estArrivalAirportName); // TODO
+        this.mEstArrivalAirportName = estArrivalAirportName;
     }
 
     public float getHeading() {
