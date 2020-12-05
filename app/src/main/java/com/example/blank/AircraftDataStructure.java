@@ -24,32 +24,32 @@ public class AircraftDataStructure {
                 this.mAircraftBuckets[i][j] = new ArrayList<>();
             }
         }
-        // FIXME: This was added for testing orientation stuff
-        float latitude = (float)43.117686;
-        float longitude = (float)-88.293514;
-        int time = Calendar.getInstance().getTime().getSeconds();
-        Aircraft testAircraft = new Aircraft(
-                time,
-                0x696969, // Nice
-                "XES",
-                "Kazakhstan",
-                time,
-                time,
-                longitude,
-                latitude,
-                 3000,
-                false,
-                0,
-                0,
-                0,
-                null,
-                0,
-                "Borat",
-                false,
-                0);
-        testAircraft.updateSphericalPosition(MainActivity.mLocation.getLongitude(), MainActivity.mLocation.getLatitude(),
-                MainActivity.mLocation.getAltitude());
-        addAircraft(testAircraft);
+//        // FIXME: This was added for testing orientation stuff
+//        float latitude = (float)43.117686;
+//        float longitude = (float)-88.293514;
+//        int time = Calendar.getInstance().getTime().getSeconds();
+//        Aircraft testAircraft = new Aircraft(
+//                time,
+//                0x696969, // Nice
+//                "XES",
+//                "Kazakhstan",
+//                time,
+//                time,
+//                longitude,
+//                latitude,
+//                 3000,
+//                false,
+//                0,
+//                0,
+//                0,
+//                null,
+//                0,
+//                "Borat",
+//                false,
+//                0);
+//        testAircraft.updateSphericalPosition(MainActivity.mLocation.getLongitude(), MainActivity.mLocation.getLatitude(),
+//                MainActivity.mLocation.getAltitude());
+//        addAircraft(testAircraft);
     }
 
     public void addAircraft(Aircraft aircraft) {
