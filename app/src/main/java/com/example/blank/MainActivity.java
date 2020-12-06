@@ -34,6 +34,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -123,13 +124,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float [] mRotationMatrix;
     private TextView depCity, depAirport, arrCity, arrAirport, callsign, aircraftType, altitude, velocity, heading, longitude, latitude;
     private ImageView image;
-    private FloatingActionButton fab_main, fab1_mail, fab2_share;
+    private FloatingActionButton fab_main;
     private Animation fab_open, fab_close, fab_clock, fab_anticlock;
     private Boolean isOpen = false;
     private FrameLayout dataFrame;
     private ImageView exitButton;
     private boolean exited = true;
     private Aircraft currAircraft;
+
+    GoogleMap googleMap;
     SupportMapFragment mapFragment;
     Boolean MapUp = false;
     private long lastChecked;
@@ -157,44 +160,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         callsignIndicator = findViewById(R.id.callsignIndicator);
         fab_main = findViewById(R.id.fab);
-        fab1_mail = findViewById(R.id.fab1);
-        fab2_share = findViewById(R.id.fab2);
-        fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
-        fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
-        fab_clock = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_rotate_clock);
-        fab_anticlock = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_rotate_anticlock);
         fab_main.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (isOpen) {
-                    fab2_share.startAnimation(fab_close);
-                    fab1_mail.startAnimation(fab_close);
-                    fab_main.startAnimation(fab_anticlock);
-                    fab2_share.setClickable(false);
-                    fab1_mail.setClickable(false);
-                    isOpen = false;
-                } else {
-                    fab2_share.startAnimation(fab_open);
-                    fab1_mail.startAnimation(fab_open);
-                    fab_main.startAnimation(fab_clock);
-                    fab2_share.setClickable(true);
-                    fab1_mail.setClickable(true);
-                    isOpen = true;
-                }
-
-            }
-        });
-
-        fab2_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // open dialog
-                startDialog(view);
-            }
-        });
-
-        fab1_mail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // open map fragment
@@ -548,14 +514,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onMapReady(GoogleMap map) {
         map.addMarker(new MarkerOptions().position(new LatLng(43, -89)).title("Marker"));
-
-        Marker planeMark = map.addMarker(
-                new MarkerOptions()
-                        .position(new LatLng(43.5, -89.5))
-                        .title("plane")
-                        //.icon(BitmapDescriptorFactory.fromBitmap( PLANE IMAGE? ))
-        );
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43, -89), 7));
+        googleMap = map;
     }
 
 
@@ -567,11 +527,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             // when spawned always run in background
             while (true) {
                 if (!exited) {
-                    // Query every 1/2 sec
-                    long currTime = Calendar.getInstance().getTimeInMillis();
-                    if (currTime > lastChecked + 500) {
-                        lastChecked = currTime;
-                        mainHandler.post(new Runnable() {
+                    mainHandler.post(new Runnable() {
                             @Override
                             public void run() {
                                 image.setImageBitmap(currAircraft.getImageBitmap());
@@ -585,10 +541,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                                 latitude.setText("Latitude: " + String.valueOf(currAircraft.getLocation()[0]) + "°");
                                 longitude.setText("Longitude: " + String.valueOf(currAircraft.getLocation()[1]) + "°");
                             }
-                        });
-                    }
-
+                    });
                 }
+                if (!MapUp) {
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            googleMap.clear();
+                            googleMap.addMarker(new MarkerOptions().position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
+                                            .title("You")
+                                    //.icon(BitmapDescriptorFactory.fromBitmap( PLANE IMAGE? ))
+                            );
+                            ArrayList<Aircraft> planes = mapper.getAirTracker().getAllAircraft();
+                            for (Aircraft plane : planes) {
+                                float[] vals = plane.getLocation();
+                                googleMap.addMarker(new MarkerOptions().position(new LatLng(vals[0], vals[1]))
+                                                .title(plane.getCallsign())
+                                        //.icon(BitmapDescriptorFactory.fromBitmap( PLANE IMAGE? ))
+                                );
+                            }
+                        }
+                    });
+                }
+                // Query every 1/2 sec
+                SystemClock.sleep(1000);
             }
         }
     }
