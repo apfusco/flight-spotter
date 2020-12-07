@@ -52,7 +52,6 @@ public class AirTracker {
         JSONObject jsonObject = getAPILocations(posLon, posLat);
         if (jsonObject != null) {
             try {
-                Log.i("API", jsonObject.toString()); // TODO: Remove this line
                 int time = jsonObject.getInt("time");
                 JSONArray states = jsonObject.getJSONArray("states");
                 this.mAircraft.clearAircraft();
@@ -163,8 +162,6 @@ public class AirTracker {
     }
 
     public void updateMoreInfo(Aircraft aircraft) {
-        // FIXME: This method is broken because the API doesn't work
-        System.out.println("\n\n\nupdateCache()\n\n\n"); // TODO
         if (this.cache.containsKey(aircraft.getIcao24())) {
             // Aircraft is already in cache.
             AircraftInfo info = this.cache.get(aircraft.getIcao24());
@@ -279,8 +276,6 @@ public class AirTracker {
             double diffLat = (double)VISUAL_DISTANCE * 360 / getEarthRadius((float)posLat) / 2 / Math.PI;
             double diffLon = (double)VISUAL_DISTANCE * 360 / getEarthRadius((float)posLat)
                     / Math.cos(posLat * 2 * Math.PI / 360) / 2 / Math.PI;
-            Log.i("diffLat", Double.toString(diffLat));
-            Log.i("diffLon", Double.toString(diffLon));
             double lamin = posLat - diffLat;
             double lamax = posLat + diffLat;
             double lomin = posLon - diffLon;
