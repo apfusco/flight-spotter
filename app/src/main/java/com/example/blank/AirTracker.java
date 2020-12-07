@@ -128,6 +128,7 @@ public class AirTracker {
      */
     private JSONTokener makeRequest(String urlString, String requestType, String params) {
         JSONTokener jsonTokener = null;
+        Log.i("QUERY", urlString + "?" + params);
         try {
             // Make HTTP request
             HttpURLConnection connection;
@@ -181,7 +182,6 @@ public class AirTracker {
                     .appendQueryParameter("begin", Integer.toString(time - 60 * 60 * 24 * 20)) // Past 20 days
                     .appendQueryParameter("end", Integer.toString(time + 60 * 60 * 24 * 5)); // Next 5 days
             String params = builder.build().getEncodedQuery();
-            Log.i("QUERY", params);
 
             JSONTokener jsonTokener = this.makeRequest((OPENSKY_URL + "/flights/aircraft"), "GET",
                     params);
@@ -224,7 +224,6 @@ public class AirTracker {
                 .appendQueryParameter("m", Integer.toString(aircraft.getIcao24(), 16))
                 .appendQueryParameter("n", Integer.toString(1));
         String params = builder.build().getEncodedQuery();
-        Log.i("QUERY", params);
 
         JSONTokener jsonTokener = this.makeRequest(PIC_URL, "GET", params);
         JSONObject jsonResponse;
@@ -245,7 +244,6 @@ public class AirTracker {
         Uri.Builder builder = new Uri.Builder()
                 .appendQueryParameter("icao", aircraft.getEstDepartureAirport());
         String params = builder.build().getEncodedQuery();
-        Log.i("QUERY", params);
 
         JSONTokener jsonTokener = this.makeRequest(AIRPORT_URL, "GET", params);
         JSONObject jsonResponse;
@@ -294,7 +292,6 @@ public class AirTracker {
                     .appendQueryParameter("lomin", Float.toString((float)lomin))
                     .appendQueryParameter("lomax", Float.toString((float)lomax));
             String params = builder.build().getEncodedQuery();
-            Log.i("QUERY", params);
 
             JSONTokener jsonTokener = this.makeRequest((OPENSKY_URL + "/states/all"), "GET",
                     params);
