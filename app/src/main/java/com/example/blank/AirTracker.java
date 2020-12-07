@@ -152,6 +152,8 @@ public class AirTracker {
             }
 
             jsonTokener = new JSONTokener(responseString);
+            bufferedReader.close();
+            inputStreamReader.close();
             connection.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
