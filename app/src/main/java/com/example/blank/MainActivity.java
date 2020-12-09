@@ -495,7 +495,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
         // Update static fields
-        mapper.update = currAircraft;
+        if (currAircraft.getImageBitmap() == null) {
+            mapper.update = currAircraft;
+        }
         callsign.setText("Callsign: " + currAircraft.getCallsign());
         // TODO aircraftType.setText();
         // Allow thread to update dynamic fields
@@ -535,11 +537,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             public void run() {
                                 if (currAircraft.getImageBitmap() != null) {
                                     image.setImageBitmap(currAircraft.getImageBitmap());
+                                } else {
+                                    image.setImageResource(R.drawable.no_image_icon_6);
                                 }
-                                depCity.setText(currAircraft.getEstDepartureAirportName());
-                                depAirport.setText(currAircraft.getEstDepartureAirport());
-                                arrCity.setText(currAircraft.getEstArrivalAirportName());
-                                arrAirport.setText(currAircraft.getEstArrivalAirport());
+                                if (currAircraft.getEstDepartureAirportName() != null) {
+                                    depCity.setText(currAircraft.getEstDepartureAirportName());
+                                }
+                                if (currAircraft.getEstDepartureAirport() != null) {
+                                    depAirport.setText(currAircraft.getEstDepartureAirport());
+                                }
+                                //arrCity.setText(currAircraft.getEstArrivalAirportName());
+                                //arrAirport.setText(currAircraft.getEstArrivalAirport());
                                 altitude.setText("Altitude: " + String.valueOf(currAircraft.getAltitude()) + "m");
                                 velocity.setText("Velocity: " + String.valueOf(currAircraft.getVelocity()) + "m/s");
                                 heading.setText("Heading: " + String.valueOf(currAircraft.getHeading()) + "°");
@@ -569,7 +577,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     });
                 }
                 // Query every 1/2 sec
-                SystemClock.sleep(1000);
+                SystemClock.sleep(500);
             }
         }
     }

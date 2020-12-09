@@ -32,8 +32,8 @@ public class AirTracker {
     private static final String OPENSKY_URL = "https://opensky-network.org/api";
     private static final String AIRPORT_URL = "https://www.airport-data.com/api/ap_info.json";
     private static final String PIC_URL = "https://www.airport-data.com/api/ac_thumb.json";
-    public static final int CONNECTION_TIMEOUT = 5000;
-    public static final int READ_TIMEOUT = 5000;
+    public static final int CONNECTION_TIMEOUT = 7000;
+    public static final int READ_TIMEOUT = 7000;
     public static final int VISUAL_DISTANCE = 50000; // In meters
     private static final int EARTH_RADIUS_EQUATOR = 6378137;
     private static final int EARTH_RADIUS_POLES = 6356752;
@@ -134,8 +134,8 @@ public class AirTracker {
             URL url = new URL(urlString + "?" + params);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(requestType);
-            connection.setConnectTimeout(CONNECTION_TIMEOUT * 10);
-            connection.setReadTimeout(READ_TIMEOUT * 10);
+            connection.setConnectTimeout(CONNECTION_TIMEOUT);
+            connection.setReadTimeout(READ_TIMEOUT);
             connection.setDoInput(true);
             connection.connect();
             InputStreamReader inputStreamReader =

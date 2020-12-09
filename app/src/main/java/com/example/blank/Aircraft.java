@@ -122,22 +122,22 @@ public class Aircraft {
     public void setImageBitmap(Bitmap imageFileName) { this.mImageBitmap = imageFileName; }
 
     public void setEstDepartureAirport(String estDepartureAirport) {
-        System.out.println(estDepartureAirport); // TODO
+        //System.out.println(estDepartureAirport); // TODO
         this.mEstDepartureAirport = estDepartureAirport;
     }
 
     public void setEstDepartureAirportName(String estDepartureAirportName) {
-        System.out.println(estDepartureAirportName); // TODO
+        //System.out.println(estDepartureAirportName); // TODO
         this.mEstDepartureAirportName = estDepartureAirportName;
     }
 
     public void setEstArrivalAirport(String estArrivalAirport) {
-        System.out.println(estArrivalAirport); // TODO
+        //System.out.println(estArrivalAirport); // TODO
         this.mEstArrivalAirport = estArrivalAirport;
     }
 
     public void setEstArrivalAirportName(String estArrivalAirportName) {
-        System.out.println(estArrivalAirportName); // TODO
+        //System.out.println(estArrivalAirportName); // TODO
         this.mEstArrivalAirportName = estArrivalAirportName;
     }
 

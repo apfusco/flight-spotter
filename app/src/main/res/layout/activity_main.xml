@@ -25,17 +25,7 @@
         android:layout_height="wrap_content"
         android:alpha=".75"
         android:background="#B8B6B6"
-        android:text="TAP screen to see more information about a flight. "
-        android:textSize="18sp" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="23dp"
-        android:alpha=".75"
-        android:background="#B8B6B6"
-        android:text="CENTER a plane in the screen to highlight it."
+        android:text="TAP screen to see more information about a flight.\nCENTER a plane in the screen to highlight it.\nSOME LOW FLYING PLANES MAY NOT APPEAR!"
         android:textSize="18sp" />
 
     <FrameLayout
@@ -73,8 +63,8 @@
 
         <ScrollView
             style="@android:style/Widget.DeviceDefault.Light.ScrollView"
-            android:layout_width="300dp"
-            android:layout_height="574dp"
+            android:layout_width="350dp"
+            android:layout_height="530dp"
 
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="50dp"
@@ -107,7 +97,7 @@
                     android:orientation="horizontal">
 
                     <LinearLayout
-                        android:layout_width="125dp"
+                        android:layout_width="165dp"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
 
@@ -115,21 +105,22 @@
                             android:id="@+id/departing"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Departing"
-                            android:textSize="18sp" />
+                            android:text="Departing:"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/depCity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="City"
+                            android:text="@string/city"
                             android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/depAirport"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Airport"
+                            android:text="@string/airport"
                             android:textSize="18sp" />
                     </LinearLayout>
 
@@ -142,21 +133,22 @@
                             android:id="@+id/arriving"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Arriving"
-                            android:textSize="18sp" />
+                            android:text="Arriving:"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/arrCity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="City"
+                            android:text="@string/city"
                             android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/arrAirport"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Airport"
+                            android:text="@string/airport"
                             android:textSize="18sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -180,7 +172,7 @@
                     android:id="@+id/aircraftType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Aircraft Type"
+                    android:text="@string/aircraft_type"
                     android:textSize="18sp" />
 
                 <TextView
@@ -235,8 +227,9 @@
         android:id="@+id/dataExit"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="325dp"
-        android:layout_marginLeft="340dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="350dp"
         android:layout_marginTop="40dp"
         android:src="@drawable/circle_button" />
 

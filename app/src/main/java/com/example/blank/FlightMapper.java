@@ -44,9 +44,9 @@ public class FlightMapper implements Runnable{
     public void run () {
         while (true) {
             if (update != null) {
-                airTracker.updateMoreInfo(update);
-                MainActivity.updating = false;
-                update = null;
+                    airTracker.updateMoreInfo(update);
+                    MainActivity.updating = false;
+                    update = null;
             }
             // Query every 20 sec so your IP doesn't get banned by the API
             long currTime = Calendar.getInstance().getTimeInMillis();
