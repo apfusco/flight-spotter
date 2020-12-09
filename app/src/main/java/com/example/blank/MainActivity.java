@@ -530,7 +530,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     mainHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                image.setImageBitmap(currAircraft.getImageBitmap());
+                                if (currAircraft.getImageBitmap() != null) {
+                                    image.setImageBitmap(currAircraft.getImageBitmap());
+                                }
                                 depCity.setText(currAircraft.getEstDepartureAirportName());
                                 depAirport.setText(currAircraft.getEstDepartureAirport());
                                 arrCity.setText(currAircraft.getEstArrivalAirportName());
