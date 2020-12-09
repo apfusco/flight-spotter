@@ -513,8 +513,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onMapReady(GoogleMap map) {
-        map.addMarker(new MarkerOptions().position(new LatLng(43, -89)).title("Marker"));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43, -89), 7));
+        map.addMarker(new MarkerOptions().position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
+                        .title("You")
+                //.icon(BitmapDescriptorFactory.fromBitmap( PLANE IMAGE? ))
+        );
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), 8));
         googleMap = map;
     }
 
