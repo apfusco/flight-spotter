@@ -28,6 +28,17 @@
         android:text="TAP screen to see more information about a flight.\nCENTER a plane in the screen to highlight it.\nSOME LOW FLYING PLANES MAY NOT APPEAR!"
         android:textSize="18sp" />
 
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/frameLayout"
+        android:layout_alignBottom="@id/frame_layout"
+        android:background="#000000"
+        android:text="Flight Spotter v1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -64,10 +75,10 @@
         <ScrollView
             style="@android:style/Widget.DeviceDefault.Light.ScrollView"
             android:layout_width="350dp"
-            android:layout_height="530dp"
+            android:layout_height="550dp"
 
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="75dp"
             android:background="@drawable/frame">
 
             <LinearLayout
@@ -81,6 +92,49 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:src="@drawable/no_image_icon_6" />
+
+                <TextView
+                    android:id="@+id/aircraftStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Aircraft Status"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/altitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Altitude"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/velocity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Velocity"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/heading"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Heading"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/longitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Longitude"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/latitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Latitude"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/flightInfoTitle"
@@ -175,49 +229,6 @@
                     android:text="@string/aircraft_type"
                     android:textSize="18sp" />
 
-                <TextView
-                    android:id="@+id/aircraftStatus"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Aircraft Status"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:textSize="24sp" />
-
-                <TextView
-                    android:id="@+id/altitude"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Altitude"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/velocity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Velocity"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/heading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Heading"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/latitude"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Latitude"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/longitude"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Longitude"
-                    android:textSize="18sp" />
-
             </LinearLayout>
         </ScrollView>
 
@@ -230,7 +241,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_marginStart="350dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="60dp"
         android:src="@drawable/circle_button" />
 
 

@@ -151,7 +151,7 @@ public class FlightMapper implements Runnable{
                         closestAircraft = aircraft;
                     }
                     // Map point to screen
-                    drawPlaneToScreenLocation(screenX, screenY, adjRoll, count, aircraft.getmIcao24(), aircraft.getScreenDirection());
+                    drawPlaneToScreenLocation(screenX, screenY, adjRoll, count, aircraft.getmIcao24(), 0); // TODO add direction
                     count++;
                     if (count == 20) {
                         break;

@@ -169,7 +169,7 @@ public class AirTracker {
             aircraft.setEstArrivalAirport(info.getEstArrivalAirport());
             return;
         }
-
+        this.getImage(aircraft);
         try {
             // Thread.sleep(10); // Don't overwhelm the API.
             int time = (new Long(Calendar.getInstance().getTime().getTime() / 1000))
@@ -212,7 +212,7 @@ public class AirTracker {
             // This might happen every once in a while
             e.printStackTrace();
         }
-        this.getImage(aircraft);
+
     }
 
     private void getImage(Aircraft aircraft) {

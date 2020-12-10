@@ -11,7 +11,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.VectorDrawable;
@@ -34,6 +36,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -53,6 +56,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.dynamic.IObjectWrapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -84,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextureView textureView;
 
     // camera components
+    private Bitmap person;
+    private Bitmap plane;
     private String cameraId;
     private CameraDevice cameraDevice;
     private ImageReader imageReader;
@@ -173,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
         });
-        fab_main.hide(); // hide button on boot, should just be camera view to user until clicked
+        //fab_main.hide(); // hide button on boot, should just be camera view to user until clicked
 
         // keep 16:9 ratio by removing to bar
         decorView = getWindow().getDecorView();
@@ -515,11 +521,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onMapReady(GoogleMap map) {
+        plane = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.air_plane_airport_2), 70, 70, false);
+        person = BitmapFactory.decodeResource(this.getResources(), R.drawable.person);
         map.addMarker(new MarkerOptions().position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
                         .title("You")
-                //.icon(BitmapDescriptorFactory.fromBitmap( PLANE IMAGE? ))
         );
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), 8));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), 9));
         googleMap = map;
     }
 
@@ -542,9 +549,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                                 }
                                 if (currAircraft.getEstDepartureAirportName() != null) {
                                     depCity.setText(currAircraft.getEstDepartureAirportName());
+                                } else {
+                                    depCity.setText("<City>");
                                 }
                                 if (currAircraft.getEstDepartureAirport() != null) {
                                     depAirport.setText(currAircraft.getEstDepartureAirport());
+                                } else {
+                                    depAirport.setText("<Airport>");
                                 }
                                 //arrCity.setText(currAircraft.getEstArrivalAirportName());
                                 //arrAirport.setText(currAircraft.getEstArrivalAirport());
@@ -556,22 +567,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             }
                     });
                 }
-                if (!MapUp) {
+                if (.
+
+                MapUp) {
                     mainHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             googleMap.clear();
                             googleMap.addMarker(new MarkerOptions().position(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()))
-                                            .title("You")
-                                    //.icon(BitmapDescriptorFactory.fromBitmap( PLANE IMAGE? ))
+                                            .title("You").icon(BitmapDescriptorFactory.fromBitmap(person))
                             );
                             ArrayList<Aircraft> planes = mapper.getAirTracker().getAllAircraft();
-                            for (Aircraft plane : planes) {
-                                float[] vals = plane.getLocation();
-                                googleMap.addMarker(new MarkerOptions().position(new LatLng(vals[0], vals[1]))
-                                                .title(plane.getCallsign())
-                                        //.icon(BitmapDescriptorFactory.fromBitmap( PLANE IMAGE? ))
-                                );
+                            for (Aircraft aircraft : planes) {
+                                if (aircraft.getPitch() > .1) {
+                                    float[] vals = aircraft.getLocation();
+                                    googleMap.addMarker(new MarkerOptions().position(new LatLng(vals[0], vals[1]))
+                                                    .title(aircraft.getCallsign()).icon(BitmapDescriptorFactory.fromBitmap(plane))
+                                    );
+                                }
                             }
                         }
                     });
