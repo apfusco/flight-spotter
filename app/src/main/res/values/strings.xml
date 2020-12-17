@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Blank</string>
+    <string name="app_name">Flight Spotter</string>
     <string name="longi">Long:    </string>
     <string name="alt">Alt:     </string>
     <string name="lat">Lat:     </string>
