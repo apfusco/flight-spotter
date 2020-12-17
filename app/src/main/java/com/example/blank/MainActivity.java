@@ -567,9 +567,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             }
                     });
                 }
-                if (.
-
-                MapUp) {
+                if (MapUp) {
                     mainHandler.post(new Runnable() {
                         @Override
                         public void run() {
